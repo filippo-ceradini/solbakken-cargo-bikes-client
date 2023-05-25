@@ -3,7 +3,7 @@
     let login_email = '';
     let login_password = '';
     import io from "socket.io-client"
-    const socket = io("https://solbakken-cargo-server.onrender.com/");
+    const socket = io("localhost:8080");
     function handleLogin() {
         socket.emit('login', {email: login_email, password: login_password});
         console.log(`Logging in with email: ${login_email} and password: ${login_password}`);
@@ -21,7 +21,7 @@
 </script>
 
 <div class="login">
-    <h2>Login</h2>
+    <img src="https://solbakken.dk/wp-content/uploads/2017/05/cropped-cropped-Solbakken-Logo.png" alt="Solbakken Logo"/>
     <div class="mb-3">
         <label class="form-label" for="email">Email</label>
         <input id="email" bind:value={login_email} type="email" class="form-control" placeholder="Email" required/>

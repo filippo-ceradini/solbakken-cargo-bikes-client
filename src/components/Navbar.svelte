@@ -12,18 +12,19 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav">
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Home</a>
+                    <a class="nav-link" href="/">Home</a>
                 </li>
-                {#if !loggedIn}
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Contact</a>
+                        <a class="nav-link" href="/contacts">Contact</a>
                     </li>
-                {/if}
                 {#if loggedIn}
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Profile</a>
+                        <a class="nav-link" href="/account">Profile</a>
                     </li>
                 {/if}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/about">About</a>
+                    </li>
             </ul>
         </div>
     </div>

@@ -1,27 +1,26 @@
 <script>
     import { navigate } from 'svelte-routing';
+    import toastr from 'toastr';
+    import io from "socket.io-client"
+    const socket = io("localhost:8080");
+
     let signupName = '';
     let signupEmail = '';
     let signupPassword = '';
 
     function handleSignup() {
-        // handle the signup logic here
+        socket.emit('subscribe-email', {username: signupName, email: signupEmail, password: signupPassword});
         console.log(`Signing up with name: ${signupName}, email: ${signupEmail}, and password: ${signupPassword}`);
-    }
-    import toastr from 'toastr';
-
-    import io from "socket.io-client"
-    const socket = io("https://solbakken-cargo-server.onrender.com/");
-    function handleLogin() {
-        socket.emit('subscribe-email', {name: signupName, email: signupEmail, password: signupPassword});
     }
 
     //Log Messages
-    socket.on('log-messages', function (data) {
+    socket.on('subscribe-messages', function (data) {
         console.log(data);
         if (data.message) {
             toastr.success(data.message);
-            navigate('/');
+            if (data.loginPageUrl) {
+                navigate(data.loginPageUrl); // navigate to the login page
+            }
         } else {
             toastr.error(data.error);
         }
@@ -29,7 +28,7 @@
 </script>
 
 <div class="signup">
-    <h2>Signup</h2>
+    <img src="https://solbakken.dk/wp-content/uploads/2017/05/cropped-cropped-Solbakken-Logo.png" alt="Solbakken Logo"/>
     <div class="mb-3">
         <label class="form-label">Name</label>
         <input bind:value={signupName} type="text" class="form-control" placeholder="Name" required/>
