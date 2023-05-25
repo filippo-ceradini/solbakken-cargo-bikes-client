@@ -1,31 +1,35 @@
 <script>
     import {Route, Router} from "svelte-routing";
-    import Navbar from "./components/Navbar.svelte";
+    import Navbarer from "./components/Navbarer.svelte";
     import HomePage from "./pages/HomePage.svelte";
     import io from "socket.io-client"
     import LandingPage from "./pages/LandingPage.svelte";
     import About from "./pages/About.svelte";
     import Contact from "./pages/Contact.svelte";
     import Account from "./pages/Account.svelte";
-    // import { config } from 'dotenv';
-    // config();
-    const socket = io('http://localhost:8080');
-    import { onMount } from 'svelte';
-    import {myUsername} from "./stores/globalStore";
+    import {onMount} from 'svelte';
+    import {myUsername} from './stores/globalstore.js';
 
-    let user = null;
-    $: loggedIn = user !== null;
+    const socket = io(import.meta.env.VITE_SOCKET_URL);
+    let username;
+    myUsername.subscribe(value => { username = value; });
+    $: loggedIn = username !== null;
+
+    let loggedIn = false;
 
     onMount(() => {
-        socket.on('session', (sessionUser) => {
-            myUsername.set(sessionUser);
-            alert("session user: " + sessionUser);
+        const storedUsername = localStorage.getItem("username");
+        myUsername.set(storedUsername || null);
+        return myUsername.subscribe(value => {
+            loggedIn = value !== null;
         });
     });
+
 </script>
 
 <main>
-    <Navbar />
+<!--    <Navbar />-->
+    <Navbarer />
 </main>
 
 

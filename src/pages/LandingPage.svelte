@@ -2,9 +2,32 @@
     import Login from "../components/Login.svelte";
     import Signup from "../components/Signup.svelte";
     import Modal from "../components/Modal.svelte";
+    import { navigate } from "svelte-routing";
+    import toastr from "toastr";
+    import io from "socket.io-client"
     let data;
     let showLogin = false;
     let showSignUp = false;
+
+    const socket = io(import.meta.env.VITE_SOCKET_URL);
+    socket.on('broadcast-log-messages', (data) => {
+        if (data.success) {
+            toastr.success(`${data.email} logged in`);
+            closePopup();
+            //wait 2 seconds before redirecting
+            setTimeout(() => {
+                navigate('/');
+            }, 2000);
+
+        } else {
+            toastr.error("problem",data.error);
+        }
+    })
+
+    function closePopup(){
+        showLogin = false;
+        showSignUp = false;
+    }
 
     const onShowLogin = () => {
         showLogin = true;

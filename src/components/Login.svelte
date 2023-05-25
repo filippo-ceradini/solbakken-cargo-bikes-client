@@ -1,23 +1,24 @@
 <script>
-    import toastr from 'toastr';
     let login_email = '';
     let login_password = '';
     import io from "socket.io-client"
-    const socket = io("localhost:8080");
+    const socket = io(import.meta.env.VITE_SOCKET_URL);
+    import {myUsername} from "../stores/globalStore";
+    let username;
+    myUsername.subscribe(value => { username = value; });
+    $: loggedIn = username !== null;
     function handleLogin() {
         socket.emit('login', {email: login_email, password: login_password});
-        console.log(`Logging in with email: ${login_email} and password: ${login_password}`);
+        socket.on('log-messages', (data) => {
+            if (data.success) {
+                myUsername.set(data.user);
+                localStorage.setItem("username", data.user);
+            } else {
+                alert('Wrong email or password');
+            }
+        });
     }
 
-    //Log Messages
-    socket.on('log-messages', function (data) {
-        console.log(data);
-        if (data.message) {
-            toastr.success(data.message);
-        } else {
-            toastr.error(data.error);
-        }
-    })
 </script>
 
 <div class="login">
