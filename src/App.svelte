@@ -2,14 +2,14 @@
     import {Route, Router} from "svelte-routing";
     import Navbar from "./components/Navbar.svelte";
     import HomePage from "./pages/HomePage.svelte";
-
     import io from "socket.io-client"
     import LandingPage from "./pages/LandingPage.svelte";
     import About from "./pages/About.svelte";
     import Contact from "./pages/Contact.svelte";
     import Account from "./pages/Account.svelte";
-
-    const socket = io("http://localhost:8080");
+    // import { config } from 'dotenv';
+    // config();
+    const socket = io('http://localhost:8080');
     import { onMount } from 'svelte';
     import {myUsername} from "./stores/globalStore";
 
@@ -30,11 +30,14 @@
 
 
 <Router>
-    <Route path="/" component={LandingPage} />
-    <Route path="/home" component={HomePage} />
+    {#if loggedIn}
+        <Route path="/" component={HomePage} />
+        <Route path="/account" component={Account} />
+    {:else}
+        <Route path="/" component={LandingPage} />
+    {/if}
     <Route path="/about" component={About} />
     <Route path="/contact" component={Contact} />
-    <Route path="/account" component={Account} />
 </Router>
 
 <style>

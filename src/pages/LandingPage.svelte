@@ -35,8 +35,12 @@
 
 
     </p>
-    <button type="button" class="btn-dark" on:click={onShowLogin}>Login</button>
-    <button type="button" class="btn-dark" on:click={onShowSignUp}>SignUp</button>
+<!--    div that displays the buttons vertically-->
+    <div class="btn-group-vertical">
+        <button type="button" class="btn-dark" on:click={onShowLogin}>Login</button>
+        <button type="button" class="btn-dark" on:click={onShowSignUp}>Sign-up</button>
+    </div>
+
 
 
     <Modal open={showLogin} title="Login" onClosed={(data) => onPopupClose(data)}>
@@ -47,3 +51,16 @@
     </Modal>
 
 </main>
+
+<style>
+    .btn-group-vertical {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .btn-dark {
+        margin: 5px;
+    }
+</style>
