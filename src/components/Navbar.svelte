@@ -1,47 +1,71 @@
 <script>
-    import { myUsername } from '../stores/globalstore.js';
+    import {preferences} from '../stores/globalStore.js'
+    import toastr from 'toastr';
+    import 'toastr/build/toastr.min.css';
     import {onMount} from 'svelte';
 
-    import {
-        Button,
-        Dropdown,
-        DropdownItem,
-        Chevron,
-        DropdownDivider,
-        Navbar,
-        NavBrand,
-        NavHamburger,
-        NavUl,
-        NavLi
-    } from 'flowbite-svelte';
-    let group3 = 2;
-
     import io from "socket.io-client"
-
+    import {navigate} from "svelte-routing";
+    let username = null;
+    preferences.subscribe(value => {
+        username = value.username;
+    });
     let loggedIn = false;
-
     onMount(() => {
-        const storedUsername = localStorage.getItem("username");
-        myUsername.set(storedUsername || null);
-        return myUsername.subscribe(value => {
-            loggedIn = value !== null;
+        preferences.subscribe(value => {
+            loggedIn = value.loggedIn;
         });
     });
 
+    function openLoginModal() {
+        preferences.update(value => {
+            return {...value, showLogin: true};
+        });
+    }
 
+
+    toastr.options = {
+        "closeButton": false,
+        "debug": false,
+        "newestOnTop": false,
+        "progressBar": true,
+        "positionClass": "toast-top-center",
+        "preventDuplicates": false,
+        "onclick": null,
+        "showDuration": "300",
+        "hideDuration": "1000",
+        "timeOut": "1000",
+        "extendedTimeOut": "1000",
+        "showEasing": "swing",
+        "hideEasing": "linear",
+        "showMethod": "fadeIn",
+        "hideMethod": "fadeOut"
+    }
 
 
     const socket = io(import.meta.env.VITE_SOCKET_URL);
 
     function logout() {
-        socket.emit("logout", myUsername);
-        myUsername.set(null);
-        localStorage.removeItem("username");
+        preferences.update(value => {
+            if (value.username !== null) {
+                socket.emit("logout", value.username);
+                return { theme: 'dark',
+                    loggedIn: false,
+                    username: null,
+                    showLogin: false };
+            } else {
+                toastr.error("You are not logged in");
+                return value;
+            }
+        });
+        toastr.info("Logged out successfully");
+        navigate("/");
     }
+
 
 </script>
 
-<nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark p-3 fixed-top">
     <div class="container-fluid">
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                 aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -50,72 +74,39 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav">
                 <li class="nav-item">
-                    <a class="nav-link" href="/">Home</a>
+                    <a class="nav-link" on:click|preventDefault={() => navigate('/')}>Home</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/contact">Contact</a>
+                    <a class="nav-link" on:click|preventDefault={() => navigate('/contact')}>Contact</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/about">About</a>
+                    <a class="nav-link" on:click|preventDefault={() => navigate('/about')}>About</a>
                 </li>
             </ul>
             <ul class="navbar-nav ml-auto">
                 {#if loggedIn}
                     <li>
-                        <button class="dropdown-item" on:click={logout}>Logout</button>
+                        <a class="nav-link" on:click={logout}  >Logout</a>
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
                            data-bs-toggle="dropdown" aria-expanded="false">
-                            {#if $myUsername}
-                                {$myUsername}
-                            {/if}
+                            {username}
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <li><a class="dropdown-item" href="/account">Profile</a></li>
+                            <li><a class="dropdown-item" on:click|preventDefault={() => navigate('/account')}>Profile</a></li>
                         </ul>
                     </li>
                 {:else}
                     <li class="nav-item">
-                        <a class="nav-link" href="/login">Login</a>
+                        <a class="nav-link" on:click={openLoginModal}>Login</a>
                     </li>
                 {/if}
             </ul>
         </div>
     </div>
 </nav>
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark p-3">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="#">Navbar</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
 
-        <div class=" collapse navbar-collapse" id="navbarNavDropdown">
-            <ul class="navbar-nav ms-auto ">
-                <li class="nav-item">
-                    <a class="nav-link mx-2 active" aria-current="page" href="#">Home</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link mx-2" href="#">Products</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link mx-2" href="#">Pricing</a>
-                </li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link mx-2 dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        Company
-                    </a>
-                    <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                        <li><a class="dropdown-item" href="#">Blog</a></li>
-                        <li><a class="dropdown-item" href="#">About Us</a></li>
-                        <li><a class="dropdown-item" href="#">Contact us</a></li>
-                    </ul>
-                </li>
-            </ul>
-        </div>
-    </div>
-</nav>
 
 <style>
     .navbar {
@@ -128,4 +119,5 @@
         justify-content: space-around;
         flex-basis: auto;
     }
+
 </style>

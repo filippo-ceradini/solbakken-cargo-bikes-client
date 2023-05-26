@@ -2,46 +2,43 @@
     import Login from "../components/Login.svelte";
     import Signup from "../components/Signup.svelte";
     import Modal from "../components/Modal.svelte";
-    import { navigate } from "svelte-routing";
+    import {preferences} from '../stores/globalStore.js'
     import toastr from "toastr";
     import io from "socket.io-client"
-    let data;
     let showLogin = false;
     let showSignUp = false;
+    preferences.subscribe(value => {
+        showLogin = value.showLogin;
+    });
+
 
     const socket = io(import.meta.env.VITE_SOCKET_URL);
     socket.on('broadcast-log-messages', (data) => {
         if (data.success) {
             toastr.success(`${data.email} logged in`);
-            closePopup();
-            //wait 2 seconds before redirecting
-            setTimeout(() => {
-                navigate('/');
-            }, 2000);
 
         } else {
-            toastr.error("problem",data.error);
+            toastr.error("problem", data.error);
         }
     })
 
-    function closePopup(){
-        showLogin = false;
-        showSignUp = false;
-    }
-
     const onShowLogin = () => {
-        showLogin = true;
+        console.log("show login")
+        preferences.update(value => {
+            return {...value, showLogin: true};
+        });
     }
 
     const onShowSignUp = () => {
         showSignUp = true;
     }
 
-    const onPopupClose = () => {
-        showLogin = false;
+     export const onPopupClose = () => {
+        preferences.update(value => {
+            return {...value, showLogin: false};
+        });
         showSignUp = false;
     }
-
 
 
 </script>
@@ -58,15 +55,14 @@
 
 
     </p>
-<!--    div that displays the buttons vertically-->
+    <!--    div that displays the buttons vertically-->
     <div class="btn-group-vertical">
         <button type="button" class="btn-dark" on:click={onShowLogin}>Login</button>
         <button type="button" class="btn-dark" on:click={onShowSignUp}>Sign-up</button>
     </div>
 
 
-
-    <Modal open={showLogin} title="Login" onClosed={(data) => onPopupClose(data)}>
+    <Modal bind:open={showLogin} title="Login" onClosed={(data) => onPopupClose(data)}>
         <Login/>
     </Modal>
     <Modal open={showSignUp} title="Sign-up" onClosed={(data) => onPopupClose(data)}>
