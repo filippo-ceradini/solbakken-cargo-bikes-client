@@ -55,6 +55,15 @@
 
 
     </p>
+    <button on:click={() => {
+        socket.emit("testLogin", 'test');
+        console.log('testing Login Session');
+    }}>Test Login</button>
+    <button on:click={() => {
+        socket.emit("test", 'test');
+        socket.emit("testAuth", 'testAuth');
+        console.log('asking for status');
+    }}>Check Socket</button>
     <!--    div that displays the buttons vertically-->
     <div class="btn-group-vertical">
         <button type="button" class="btn-dark" on:click={onShowLogin}>Login</button>

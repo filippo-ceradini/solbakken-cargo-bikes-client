@@ -8,6 +8,7 @@
     import {navigate} from "svelte-routing";
     let username = null;
     preferences.subscribe(value => {
+        console.log("navbar thinks",value.loggedIn, value)
         username = value.username;
     });
     let loggedIn = false;
@@ -46,20 +47,20 @@
     const socket = io(import.meta.env.VITE_SOCKET_URL);
 
     function logout() {
-        preferences.update(value => {
-            if (value.username !== null) {
-                socket.emit("logout", value.username);
-                return { theme: 'dark',
-                    loggedIn: false,
-                    username: null,
-                    showLogin: false };
-            } else {
-                toastr.error("You are not logged in");
-                return value;
-            }
-        });
-        toastr.info("Logged out successfully");
-        navigate("/");
+        // preferences.update(value => {
+        //     if (value.username !== null) {
+        //         socket.emit("logout", value.username);
+        //         return { theme: 'dark',
+        //             loggedIn: false,
+        //             username: null,
+        //             showLogin: false };
+        //     } else {
+        //         toastr.error("You are not logged in");
+        //         return value;
+        //     }
+        // });
+        // toastr.info("Logged out successfully");
+        // navigate("/");
     }
 
 

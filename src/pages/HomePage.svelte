@@ -1,7 +1,7 @@
 <script>
     import { navigate } from 'svelte-routing';
     import io from "socket.io-client"
-    const socket = io(import.meta.env.BASE_URL);
+    const socket = io(import.meta.env.VITE_SOCKET_URL);
 
     import {onMount} from 'svelte';
     import {preferences} from "../stores/globalStore.js";
@@ -11,13 +11,12 @@
     let statusBike1 = "Available";
     let statusBike2 = "Available";
 
-    onMount(() => {
-        socket.on('connect', () => {
-            console.log('connected');
-            socket.emit("getBikeStatus", '6467cf90314e17fe4414a17f');
-            socket.emit("getBikeStatus", '64675ee4253ddd95f01b580e');
-        });
-    });
+    function grtStatus() {
+        socket.emit("test", 'test');
+        console.log('asking for status');
+        socket.emit("getBikeStatus", '6467cf90314e17fe4414a17f');
+        socket.emit("getBikeStatus", '64675ee4253ddd95f01b580e');
+    }
 
     socket.on('bike-status', ({ bikeId, status }) => {
         if (bikeId === 'bike1') {
@@ -43,6 +42,12 @@
         <span class="status-label {statusBike1.toLowerCase()}">{statusBike1}</span>
         <img src={bike1} class="bike-image" alt="Bike 1" on:click={bookBike1} />
     </div>
+    <button on:click={() => {
+        socket.emit("test", 'test');
+        socket.emit("testAuth", 'testAuth');
+        console.log('asking for status');
+
+    }}>Check Socket</button>
     <div class="bike-container">
         <span class="status-label {statusBike2.toLowerCase()}">{statusBike2}</span>
         <img src={bike2} class="bike-image" alt="Bike 2" on:click={bookBike2} />

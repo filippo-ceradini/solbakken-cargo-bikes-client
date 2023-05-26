@@ -6,8 +6,8 @@
     import io from "socket.io-client"
     const socket = io(import.meta.env.VITE_SOCKET_URL);
     function handleLogin() {
-        alert(import.meta.env.VITE_SOCKET_URL)
         socket.emit('login', {email: login_email, password: login_password});
+        console.log("emitting login")
         socket.on('log-messages', async (data) => {
             if (data.success) {
                 await preferences.update(value => {
