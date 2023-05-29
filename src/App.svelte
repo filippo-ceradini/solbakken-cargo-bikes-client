@@ -5,6 +5,7 @@
     import io from "socket.io-client"
     import LandingPage from "./pages/LandingPage.svelte";
     import About from "./pages/About.svelte";
+
     import Contact from "./pages/Contact.svelte";
     import Account from "./pages/Account.svelte";
     import {preferences, socket} from './stores/globalStore.js';
