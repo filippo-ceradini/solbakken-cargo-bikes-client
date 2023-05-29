@@ -2,9 +2,9 @@
     import Login from "../components/Login.svelte";
     import Signup from "../components/Signup.svelte";
     import Modal from "../components/Modal.svelte";
-    import {preferences} from '../stores/globalStore.js'
+    import { preferences, socket} from '../stores/globalStore.js'
     import toastr from "toastr";
-    import io from "socket.io-client"
+    import CheckSession from "../components/CheckSession.svelte";
     let showLogin = false;
     let showSignUp = false;
     preferences.subscribe(value => {
@@ -12,8 +12,7 @@
     });
 
 
-    const socket = io(import.meta.env.VITE_SOCKET_URL);
-    socket.on('broadcast-log-messages', (data) => {
+    $socket.on('broadcast-log-messages', (data) => {
         if (data.success) {
             toastr.success(`${data.email} logged in`);
 
@@ -55,15 +54,6 @@
 
 
     </p>
-    <button on:click={() => {
-        socket.emit("testLogin", 'test');
-        console.log('testing Login Session');
-    }}>Test Login</button>
-    <button on:click={() => {
-        socket.emit("test", 'test');
-        socket.emit("testAuth", 'testAuth');
-        console.log('asking for status');
-    }}>Check Socket</button>
     <!--    div that displays the buttons vertically-->
     <div class="btn-group-vertical">
         <button type="button" class="btn-dark" on:click={onShowLogin}>Login</button>

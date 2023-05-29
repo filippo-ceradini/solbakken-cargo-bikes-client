@@ -1,4 +1,7 @@
 <script>
+    import { socket } from "../stores/globalStore.js";
+    import CheckSession from "../components/CheckSession.svelte";
+
     let name = '';
     let email = '';
     let message = '';

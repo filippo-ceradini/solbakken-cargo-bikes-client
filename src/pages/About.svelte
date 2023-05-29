@@ -1,3 +1,8 @@
+<script>
+    import {socket} from "../stores/globalStore.js";
+    import CheckSession from "../components/CheckSession.svelte";
+</script>
+
 <main>
     <img src="https://solbakken.dk/wp-content/uploads/2017/05/cropped-cropped-Solbakken-Logo.png" alt="Solbakken Logo"/>
     <h1>Solbakken Cargo Bikes</h1>

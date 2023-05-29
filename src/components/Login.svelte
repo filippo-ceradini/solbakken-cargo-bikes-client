@@ -1,18 +1,24 @@
 <script>
     import toastr from "toastr";
-    import { preferences } from "../stores/globalStore";
+    import { preferences,socket } from "../stores/globalStore";
     let login_email = '';
     let login_password = '';
-    import io from "socket.io-client"
-    const socket = io(import.meta.env.VITE_SOCKET_URL);
-    function handleLogin() {
-        socket.emit('login', {email: login_email, password: login_password});
-        console.log("emitting login")
-        socket.on('log-messages', async (data) => {
-            if (data.success) {
+    async function handleLogin() {
+        try {
+            const response = await fetch(import.meta.env.VITE_API_URL+ 'login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    password: login_password,
+                    email: login_email
+                }),
+            });
+            if (response.status === 200) {
                 await preferences.update(value => {
-                    console.log("data.user", data.username)
-                    return {username: data.username};
+                    console.log("data.user", login_email)
+                    return {username: login_email}
                 });
                 await preferences.update(value => {
                     return {...value, loggedIn: true};
@@ -21,10 +27,14 @@
                     return {...value, showLogin: false,};
                 });
                 toastr.success('Logged in successfully');
-            } else {
-                alert('Wrong email or password');
+            } else if (response.status !== 200 ) {
+                const errorData = await response.json();
+                toastr.error(errorData.message || 'Oops! Something went wrong.');
             }
-        });
+        } catch (error) {
+            console.error(error);
+            toastr.error("Oops! Something went wrong.");
+        }
     }
 
 </script>
