@@ -58,9 +58,11 @@
     // Function to move to the next/previous week
     function navigateWeek(offset) {
         weekOffset += offset;
+        updateWeekAvailability();
     }
 
-    let selectedBike = 'Bike 1'; // The currently selected bike
+    let selectedBike = '64675ee4253ddd95f01b580e'; // The currently selected bike
+
     let weekZero = weekOffset === 0;
 
     import {onMount} from 'svelte';
@@ -73,10 +75,9 @@
 
     async function fetchBookings() {
         // Replace 'selectedBike' with the actual bike ID
-        socket.emit('getBookingsByItem', {itemID: selectedBike});
-
+        $socket.emit('getBookings');
         // Listen for booking updates from the server
-        socket.on('booking-messages', (message) => {
+        $socket.on('booking-messages', (message) => {
             if (message.status === 200) {
                 bookings = message.bookings;
                 updateAvailability();
@@ -85,6 +86,7 @@
             }
         });
     }
+
 
     function updateAvailability() {
         bookings.forEach(booking => {
@@ -95,19 +97,43 @@
         });
     }
 
+    function updateWeekAvailability() {
+        // Reset the availability map
+        availability = {}
+
+        // Calculate the new dates for the week
+        dayDates = Array(7).fill(null).map((_, i) => {
+            let d = new Date();
+            d.setDate(now.getDate() + i + weekOffset * 7); // add 'i' days and weekOffset * 7 days to the current date
+            return d;
+        });
+
+        // Recreate the availability map based on the new dates
+        days.forEach(day => {
+            if (day === currentDay) {
+                availability[day] = Array(24).fill('Available').map((_, hour) => hour >= currentHour ? 'Available' : 'Past');
+            } else {
+                availability[day] = Array(24).fill('Available');
+            }
+        });
+
+        // Fetch the bookings for the new week
+        fetchBookings();
+    }
+
 
     async function bookBike(day, hour) {
+        toastr.success(`Bike booked for ${day} at ${hour}:00`);
         if (availability[day][hour] !== 'Booked' && availability[day][hour] !== 'Past') {
             let bookingDate = dayDates[days.indexOf(day)]; // Get the date for the selected day
             let year = bookingDate.getFullYear();
             let month = bookingDate.getMonth();
             let date = bookingDate.getDate();
-
-            socket.emit('createBooking', {
+            $socket.emit("ciao")
+            $socket.emit('createBooking', {
                 startTime: new Date(year, month, date, hour),
                 endTime: new Date(year, month, date, hour + 1),
-                itemID: selectedBike,
-                userID: user
+                itemID: selectedBike
             });
         }
     }
@@ -120,11 +146,11 @@
         {/if}
 
         <label>
-            <input type="radio" bind:group={selectedBike} value="Bike 1">
+            <input type="radio" bind:group={selectedBike} value="64675ee4253ddd95f01b580e">
             Bike 1
         </label>
         <label>
-            <input type="radio" bind:group={selectedBike} value="Bike 2">
+            <input type="radio" bind:group={selectedBike} value="6467cf90314e17fe4414a17f">
             Bike 2
         </label>
         <a on:click={() => navigateWeek(1)}>➡️</a> <!-- Navigate to next week -->
@@ -166,6 +192,12 @@
 
 
 <style>
+
+    @media (max-width: 600px) {
+        th h4, th h5 {
+            font-size: smaller;
+        }
+    }
     .cell {
         height: 3vh; /* smaller height */
         width: 10vmax; /* larger width */

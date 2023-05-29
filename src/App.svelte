@@ -7,11 +7,13 @@
     import About from "./pages/About.svelte";
     import Contact from "./pages/Contact.svelte";
     import Account from "./pages/Account.svelte";
-    import {preferences, socket} from './stores/globalstore.js';
+    import {preferences, socket} from './stores/globalStore.js';
     import Calendar from "./components/Calendar.svelte";
-    import CheckSession from "./components/CheckSession.svelte";
 
-    $socket = io("http://localhost:8080");
+    $socket = io(import.meta.env.VITE_SOCKET_URL, {
+        transports: ['websocket'],
+        upgrade: false
+    });
     $socket.on("connect", () => {
         $socket.emit("session")
     });
