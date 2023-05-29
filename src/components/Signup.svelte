@@ -1,20 +1,19 @@
 <script>
     import { navigate } from 'svelte-routing';
+    import { socket} from "../stores/globalStore.js";
     import toastr from 'toastr';
-    import io from "socket.io-client"
-    const socket = io("localhost:8080");
 
     let signupName = '';
     let signupEmail = '';
     let signupPassword = '';
 
     function handleSignup() {
-        socket.emit('subscribe-email', {username: signupName, email: signupEmail, password: signupPassword});
+        $socket.emit('subscribe-email', {username: signupName, email: signupEmail, password: signupPassword});
         console.log(`Signing up with name: ${signupName}, email: ${signupEmail}, and password: ${signupPassword}`);
     }
 
     //Log Messages
-    socket.on('subscribe-messages', function (data) {
+    $socket.on('subscribe-messages', function (data) {
         console.log(data);
         if (data.message) {
             toastr.success(data.message);

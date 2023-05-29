@@ -1,25 +1,21 @@
 <script>
-    import { navigate } from 'svelte-routing';
-    import io from "socket.io-client"
-    const socket = io(import.meta.env.BASE_URL);
+    import { navigate } from 'svelte-navigator';
+    import { socket } from '../stores/globalStore.js';
+    import {onMount} from "svelte";
 
-    import {onMount} from 'svelte';
-    import {preferences} from "../stores/globalStore.js";
     let bike1 = 'https://cykelgruppen.dk/wp-content/uploads/2021/01/DK10004-scaled.jpg';
     let bike2 = 'https://www.larryvsharry.com/media/wysiwyg/cms_pages/Homepage/new-Original.jpg'
 
     let statusBike1 = "Available";
     let statusBike2 = "Available";
 
-    onMount(() => {
-        socket.on('connect', () => {
-            console.log('connected');
-            socket.emit("getBikeStatus", '6467cf90314e17fe4414a17f');
-            socket.emit("getBikeStatus", '64675ee4253ddd95f01b580e');
-        });
+    $socket.on('connect', () => {
+        console.log('connected, asking bike status');
+        $socket.emit("getBikeStatus", '6467cf90314e17fe4414a17f');
+        $socket.emit("getBikeStatus", '64675ee4253ddd95f01b580e');
     });
 
-    socket.on('bike-status', ({ bikeId, status }) => {
+    $socket.on('bike-status', ({ bikeId, status }) => {
         if (bikeId === 'bike1') {
             statusBike1 = status;
             console.log(statusBike1)
