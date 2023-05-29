@@ -1,5 +1,5 @@
 <script>
-    import {socket} from '../stores/globalstore.js';
+    import {socket} from '../stores/globalStore.js';
     import {useParams} from "svelte-navigator";
     import toastr from 'toastr';
 
