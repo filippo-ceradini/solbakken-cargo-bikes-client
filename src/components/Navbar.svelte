@@ -66,7 +66,7 @@
 </script>
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark p-3 fixed-top">
-    <a class="navbar-brand" href="/">Home</a>
+    <a class="navbar-brand" href="#" on:click|preventDefault={() => navigate('/')}>Home</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse"
             data-target="#navbarCollapsible" aria-controls="navbarCollapsible"
             aria-expanded="false" aria-label="Toggle navigation">
@@ -76,10 +76,10 @@
     <div class="collapse navbar-collapse" id="navbarCollapsible">
         <ul class="navbar-nav mr-auto">
             <li class="nav-item">
-                <a class="nav-link" href="/contact">Contact</a>
+                <a class="nav-link" href="#" on:click|preventDefault={() => navigate('/contact')}>Contact</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="/about">About</a>
+                <a class="nav-link" href="#" on:click|preventDefault={() => navigate('/about')}>About</a>
             </li>
         </ul>
         <ul class="navbar-nav ml-auto">
