@@ -64,7 +64,7 @@
 
     function testSessionSocket(){
         console.log("test socket session")
-        // socket.emit("session", "test")
+        socket.emit("test socket session", "test")
     }
 
     function logoutSocket(){
