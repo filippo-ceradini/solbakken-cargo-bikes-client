@@ -10,6 +10,7 @@
     import Account from "./pages/Account.svelte";
     import {preferences, socket} from './stores/globalStore.js';
     import Calendar from "./components/Calendar.svelte";
+    import fourOfour from "./components/fourOfour.svelte";
 
     $socket = io(import.meta.env.VITE_SOCKET_URL, {
         transports: ['websocket'],
@@ -42,6 +43,7 @@
     {/if}
     <Route path="/about" component={About}/>
     <Route path="/contact" component={Contact}/>
+    <Route path="*" component={fourOfour}/>
 </Router>
 
 

@@ -25,6 +25,7 @@ a:hover {
 
 main{
   padding-top: 70px
+
 }
 
 body {
@@ -49,6 +50,7 @@ h1 {
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
+  background-color: #222222;
 }
 
 button {

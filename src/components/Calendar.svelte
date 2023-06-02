@@ -133,29 +133,38 @@
             $socket.emit('createBooking', {
                 startTime: new Date(year, month, date, hour),
                 endTime: new Date(year, month, date, hour + 1),
-                itemID: selectedBike
+                itemID: selectedBike,
+                userID: "murray88mph@gmail.com"
             });
         }
     }
 </script>
 
-<main style="padding-top: 70px;">
-    <div>
-        {#if weekOffset !== 0}
-            <a on:click={() => navigateWeek(-1)}>⬅️</a> <!-- Navigate to previous week -->
-        {/if}
+<main >
+    <div class="control-container">
+        <div>
+            {#if weekOffset !== 0}
+                <a on:click={() => navigateWeek(-1)}>⬅️</a> <!-- Navigate to previous week -->
+            {:else}
+                <a >⏹️</a> <!-- Navigate to next week -->
+            {/if}
+        </div>
+        <div>
+            <label>
+                <input type="radio" bind:group={selectedBike} value="64675ee4253ddd95f01b580e">
+                Bike 1
+            </label>
+            <label>
+                <input type="radio" bind:group={selectedBike} value="6467cf90314e17fe4414a17f">
+                Bike 2
+            </label>
+        </div>
+        <div>
 
-        <label>
-            <input type="radio" bind:group={selectedBike} value="64675ee4253ddd95f01b580e">
-            Bike 1
-        </label>
-        <label>
-            <input type="radio" bind:group={selectedBike} value="6467cf90314e17fe4414a17f">
-            Bike 2
-        </label>
-        <a on:click={() => navigateWeek(1)}>➡️</a> <!-- Navigate to next week -->
-
+            <a on:click={() => navigateWeek(1)}>➡️</a> <!-- Navigate to next week -->
+        </div>
     </div>
+
 
     <table class="table-container">
         <thead>
@@ -193,18 +202,75 @@
 
 <style>
 
+    body {
+        min-width: 100vw;
+        overflow-x: hidden;
+        background-color: #222222;
+    }
+    main {
+        padding-top: 70px;
+    }
+
+    /* Existing styles... */
+
+    a {
+        font-size: 1em; /* Set the initial size of the arrows */
+    }
+
+    input[type='radio'] {
+        width: 1em; /* Set the initial size of the radio buttons */
+        height: 1em; /* Set the initial size of the radio buttons */
+    }
+
     @media (max-width: 600px) {
+        a {
+            font-size: 2em; /* Increase the size of the arrows on small screens */
+        }
+
+        input[type='radio'] {
+            width: 2em; /* Increase the size of the radio buttons on small screens */
+            height: 2em; /* Increase the size of the radio buttons on small screens */
+        }
+    }
+
+    @media (max-width: 860px) {
         th h4, th h5 {
             font-size: smaller;
+        }
+        .cell{
+            width: 4vmax;
+        }
+        main {
+            padding-top: 10px; /* adjust as needed */
+            padding-left: 0;
+            padding-right: 0;
+        }
+        .table-container {
+            width: 80%; /* adjust as needed */
         }
     }
     .cell {
         height: 3vh; /* smaller height */
-        width: 10vmax; /* larger width */
+        width: 11vmax; /* larger width */
         align-items: center;
         justify-content: center;
         border: 1px solid #ddd;
         box-sizing: border-box; /* makes sure the border is included in the element's total width and height */
+
+    }
+    .control-container {
+        font-size: 2em;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .bike-selector{
+        font-size: 2em;
+    }
+
+    .table-container {
+        overflow-x: scroll;
+        -webkit-overflow-scrolling: touch;
     }
 
     .cell.Available {

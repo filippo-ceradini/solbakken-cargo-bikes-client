@@ -1,6 +1,12 @@
 <script>
-    import {preferences, socket} from "../stores/globalStore.js";
+    import {preferences } from "../stores/globalStore.js";
     import toastr from "toastr";
+    import io from "socket.io-client";
+
+    const socket = io(import.meta.env.VITE_SOCKET_URL);
+    socket.on("connect", () => {
+        socket.emit("test", {message: "test"})
+    });
 
     async function login() {
         console.log("login")
@@ -44,54 +50,39 @@
             console.log('Error:', error);
             toastr.error("Oops! Something went wrong.");
         }
-        $socket.emit("session", "test")
+        socket.emit("session", "test")
     }
 
     function logout(){
         console.log("logout")
     }
 
+    function loginSocket(){
+        console.log("login socket")
+        socket.emit("login", {email: "billy", password: "password"})
+    }
+
+    function testSessionSocket(){
+        console.log("test socket session")
+        // socket.emit("session", "test")
+    }
+
+    function logoutSocket(){
+        console.log("logout socket")
+        // socket.emit("logout", "test")
+    }
 </script>
 
 
 <main>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-light fixed-top ">
-        <a class="navbar-brand" href="#">Navbar</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse"
-                data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
-                aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav mr-auto">
-                <li class="nav-item active">
-                    <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Link</a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link disabled" href="#">Disabled</a>
-                </li>
-            </ul>
-            <ul class="navbar-nav ml-auto">
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Dropdown
-                    </a>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" href="#">Action</a>
-                        <a class="dropdown-item" href="#">Another action</a>
-                        <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="#">Something else here</a>
-                    </div>
-                </li>
-            </ul>
-        </div>
-    </nav>
-    <button on:click={login}>Test Login</button>
-    <button on:click={testSession}>Check Session</button>
-    <button on:click={logout}>Logout</button>
+    <div>
+        <button on:click={login}>Test Login express</button>
+        <button on:click={testSession}>Check Session express</button>
+        <button on:click={logout}>Logout express</button>
+    </div>
+    <div>
+        <button on:click={loginSocket}>Test Login Socket</button>
+        <button on:click={testSessionSocket}>Check Session Socket</button>
+        <button on:click={logoutSocket}>Logout Socket</button>
+    </div>
 </main>
