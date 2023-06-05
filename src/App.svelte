@@ -12,10 +12,14 @@
     import Calendar from "./components/Calendar.svelte";
     import fourOfour from "./components/fourOfour.svelte";
 
-    $socket = io(import.meta.env.VITE_SOCKET_URL, {
-        transports: ['websocket'],
-        upgrade: false
-    });
+    $socket = io(import.meta.env.VITE_SOCKET_URL
+        , {
+            transports: ['websocket'],
+            upgrade: false,
+            reconnection: true,
+            reconnectionDelay: 1000,
+            reconnectionDelayMax: 5000,
+            reconnectionAttempts: 5});
     $socket.on("connect", () => {
         $socket.emit("session")
     });

@@ -1,7 +1,9 @@
 <script>
-    import { navigate } from 'svelte-navigator';
-    import { socket } from '../stores/globalStore.js';
+    import {Link, navigate, Route} from 'svelte-navigator';
     import {onMount} from "svelte";
+    import io from "socket.io-client";
+    import Calendar from "../components/Calendar.svelte";
+    const socket = io('localhost:8080');
 
     let bike1 = 'https://cykelgruppen.dk/wp-content/uploads/2021/01/DK10004-scaled.jpg';
     let bike2 = 'https://www.larryvsharry.com/media/wysiwyg/cms_pages/Homepage/new-Original.jpg'
@@ -9,13 +11,13 @@
     let statusBike1 = "Available";
     let statusBike2 = "Available";
 
-    $socket.on('connect', () => {
+    socket.on('connect', () => {
         console.log('connected, asking bike status');
-        $socket.emit("getBikeStatus", '6467cf90314e17fe4414a17f');
-        $socket.emit("getBikeStatus", '64675ee4253ddd95f01b580e');
+        socket.emit("getBikeStatus", '6467cf90314e17fe4414a17f');
+        socket.emit("getBikeStatus", '64675ee4253ddd95f01b580e');
     });
 
-    $socket.on('bike-status', ({ bikeId, status }) => {
+    socket.on('bike-status', ({ bikeId, status }) => {
         if (bikeId === 'bike1') {
             statusBike1 = status;
             console.log(statusBike1)
@@ -34,16 +36,18 @@
     }
 </script>
 
-<div class="group-vertical">
-    <div class="bike-container">
-        <span class="status-label {statusBike1.toLowerCase()}">{statusBike1}</span>
-        <img src={bike1} class="bike-image" alt="Bike 1" on:click={bookBike1} />
+<main>
+    <div class="group-vertical">
+        <div class="bike-container">
+            <span class="status-label {statusBike1.toLowerCase()}">{statusBike1}</span>
+            <img src={bike1} class="bike-image" alt="Bike 1" on:click={bookBike1} />
+        </div>
+        <div class="bike-container">
+            <span class="status-label {statusBike2.toLowerCase()}">{statusBike2}</span>
+            <img src={bike2} class="bike-image" alt="Bike 2" on:click={bookBike2} />
+        </div>
     </div>
-    <div class="bike-container">
-        <span class="status-label {statusBike2.toLowerCase()}">{statusBike2}</span>
-        <img src={bike2} class="bike-image" alt="Bike 2" on:click={bookBike2} />
-    </div>
-</div>
+</main>
 
 <style>
     .group-vertical {

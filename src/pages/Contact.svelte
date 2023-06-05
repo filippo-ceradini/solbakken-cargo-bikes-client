@@ -1,14 +1,24 @@
 <script>
-    import { socket } from "../stores/globalStore.js";
-    import CheckSession from "../components/CheckSession.svelte";
-
+    import io from "socket.io-client"
     let name = '';
     let email = '';
     let message = '';
 
+    const socket = io('localhost:8080');
+
     const onSubmit = () => {
         // Handle form submission here
         console.log({ name, email, message });
+        // Send Email
+        socket.emit("contact-email", {name, email, message});
+        socket.on("email-response", function (data) {
+            if (data.status === 200) {
+                alert(data.message);
+            } else {
+                console.log("Error:", data.message);
+                alert("Error: " + data.message);
+            }
+        });
     }
 </script>
 

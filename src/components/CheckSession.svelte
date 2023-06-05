@@ -10,7 +10,7 @@
 
     async function login() {
         console.log("login")
-        const response = await fetch('http://localhost:8080/login', {
+        const response = await fetch('http://localhost:8080/logintest', {
 
             method: 'POST',
             headers: {
