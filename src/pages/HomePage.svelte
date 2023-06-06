@@ -1,31 +1,24 @@
 <script>
-    import {Link, navigate, Route} from 'svelte-navigator';
+    import { navigate} from 'svelte-navigator';
     import {onMount} from "svelte";
     import io from "socket.io-client";
-    import Calendar from "../components/Calendar.svelte";
+
     const socket = io('localhost:8080');
 
     let bike1 = 'https://cykelgruppen.dk/wp-content/uploads/2021/01/DK10004-scaled.jpg';
     let bike2 = 'https://www.larryvsharry.com/media/wysiwyg/cms_pages/Homepage/new-Original.jpg'
 
-    let statusBike1 = "Available";
-    let statusBike2 = "Available";
+    let statusBike1 = "";
+    let statusBike2 = "";
+    onMount(() => {
+        socket.emit("getBikeStatus");
+        socket.on('bike-status', (data) => {
+            console.log(data)
+            statusBike1 = data['Nihola Bike 1'];
+            statusBike2 = data['Bullitt Bike 2'];
+        });
+    })
 
-    socket.on('connect', () => {
-        console.log('connected, asking bike status');
-        socket.emit("getBikeStatus", '6467cf90314e17fe4414a17f');
-        socket.emit("getBikeStatus", '64675ee4253ddd95f01b580e');
-    });
-
-    socket.on('bike-status', ({ bikeId, status }) => {
-        if (bikeId === 'bike1') {
-            statusBike1 = status;
-            console.log(statusBike1)
-        } else if (bikeId === 'bike2') {
-            statusBike2 = status;
-            console.log(statusBike2)
-        }
-    });
 
     function bookBike1() {
         navigate('/book/bike1');
@@ -34,31 +27,46 @@
     function bookBike2() {
         navigate('/book/bike2');
     }
+
+    function modalBook() {
+        alert('You have booked this bike')
+    }
 </script>
 
 <main>
-    <div class="group-vertical">
-        <div class="bike-container">
-            <span class="status-label {statusBike1.toLowerCase()}">{statusBike1}</span>
-            <img src={bike1} class="bike-image" alt="Bike 1" on:click={bookBike1} />
+
+    <div class="row">
+        <div class="col">
+            <div class="bike-container">
+                <img src={bike1} class="bike-image img-fluid" alt="Bike 1" on:click={bookBike1}/>
+            </div>
         </div>
-        <div class="bike-container">
-            <span class="status-label {statusBike2.toLowerCase()}">{statusBike2}</span>
-            <img src={bike2} class="bike-image" alt="Bike 2" on:click={bookBike2} />
+        <div class="col">
+            <div class="bike-container">
+                <img src={bike2} class="bike-image img-fluid" alt="Bike 2" on:click={bookBike2}/>
+            </div>
         </div>
     </div>
+
+    <div class="row">
+        <div class="col">
+            <div class="bike-container">
+                <button class="status-label {statusBike1.toLowerCase()}" on:click={modalBook}>{statusBike1}</button>
+            </div>
+        </div>
+        <div class="col">
+            <div class="bike-container">
+                <button class="status-label {statusBike2.toLowerCase()}" on:click={modalBook}>{statusBike2}</button>
+            </div>
+        </div>
+    </div>
+    <button type="button" class="btn btn-warning" on:click={() => {navigate('/report')}}>Report a problem with the bikes</button>
 </main>
 
 <style>
-    .group-vertical {
-        display: flex;
-        flex-direction: column; /* To arrange the images vertically */
-        align-items: center;
-        justify-content: center;
-    }
-
     .bike-container {
         position: relative;
+        display: block;
     }
 
     .status-label {
@@ -71,6 +79,7 @@
         font-weight: bold;
         text-transform: uppercase;
         border-radius: 5px;
+        cursor: pointer;
     }
 
     .status-label.available {
@@ -82,21 +91,15 @@
     }
 
     .bike-image {
-        padding: 5%;
-        width: 90%; /* larger width for small screens */
-        height: auto; /* This maintains the aspect ratio */
-        transition: transform 0.3s ease-in-out; /* This will animate the scale effect */
-    }
-
-    @media screen and (min-width: 768px) {
-        .bike-image {
-            width: 30%; /* smaller width for larger screens */
-        }
+        max-width: 400px;
+        max-height: 300px;
+        margin: 10px;
+        object-fit: cover;
+        transition: transform 0.3s ease-in-out;
     }
 
     .bike-image:hover {
-        transform: scale(1.05); /* Scale the image to 105% when hovered */
-        cursor: pointer; /* Change the cursor to a hand when hovering over the image */
+        transform: scale(1.05);
+        cursor: pointer;
     }
 </style>
-

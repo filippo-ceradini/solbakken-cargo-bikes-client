@@ -11,6 +11,7 @@
     import {preferences, socket} from './stores/globalStore.js';
     import Calendar from "./components/Calendar.svelte";
     import fourOfour from "./components/fourOfour.svelte";
+    import Report from "./pages/Report.svelte";
 
     $socket = io(import.meta.env.VITE_SOCKET_URL
         , {
@@ -42,6 +43,7 @@
         <Route path="/" component={HomePage}/>
         <Route path="/account" component={Account}/>
         <Route path="/book/:item" component={Calendar}/>
+        <Route path="/report" component={Report}/>
     {:else}
         <Route path="/" component={LandingPage}/>
     {/if}

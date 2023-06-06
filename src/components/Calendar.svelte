@@ -1,5 +1,5 @@
 <script>
-    import {preferences, socket, createBookingRef} from '../stores/globalStore.js';
+    import {preferences, createBookingRef} from '../stores/globalStore.js';
     import toastr from 'toastr';
 
     export let item;
@@ -9,16 +9,17 @@
 
     let daysToView = 6
 
-    // The currently selected bike
-    let selectedBike = writable('64675ee4253ddd95f01b580e');
+    // The currently selected bike is the Nihola
+    let selectedBike;
+    $selectedBike = '6467cf90314e17fe4414a17f';
     if (item === "bike2") {
-        $selectedBike = "64675ee4253ddd95f01b580f";
+        // The currently selected bike is the Bullitt
+        $selectedBike = '64675ee4253ddd95f01b580e';
     }
     let availability = writable({}); // Availability status
     let weekOffset = writable(0); // Current week offset
     let currentDay = writable(0)
     let dayDates = writable(0)
-    let daysDates = writable(0)
 
     let userEmail;
 
@@ -31,21 +32,18 @@
 
     function handleBikeChange(bikeId) {
         $selectedBike = bikeId;
-        console.log($selectedBike)
         initialize();
     }
 
     // Function to initialize the component
-    function initialize() {
+    function initialize()
+    {
         let now = new Date();
 
-//gets the current day from the days array
+        //gets the current day from the days array
         $currentDay = days[now.getDay() === 0 ? daysToView : now.getDay() - 1];
 
-//gets the current hour from the date
-        let currentHour = now.getHours();
-
-// Calculate days until next Monday
+        // Calculate days until next Monday
         let dayOfTheWeek = now.getDay();
 
         let daysSinceLastMonday = dayOfTheWeek === 0 ? daysToView : dayOfTheWeek - 1;
@@ -72,6 +70,7 @@
 
     }
 
+
     // Function to update week availability
     function updateWeekAvailability() {
         $availability = generateAvailabilityMap();
@@ -85,7 +84,7 @@
         let currentHour = now.getHours();
         let today = new Date(now.getFullYear(), now.getMonth(), now.getDate()); // get today's date without the time
         let avMap = {};
-        $dayDates.forEach((dayDate, index) => {
+        $dayDates.forEach((dayDate) => {
             let dayOnly = new Date(dayDate.getFullYear(), dayDate.getMonth(), dayDate.getDate()); // get day's date without the time
             if (dayOnly.getTime() < today.getTime()) {
                 avMap[dayDate] = Array(24).fill('Past');
@@ -159,7 +158,17 @@
                     } else if (new Date(d) < new Date(currentDay)) {
                         $availability[dd][hour] = 'PastBooked';
                     } else {
-                        $availability[dd][hour] = booking._id;
+                        if (booking.userID.email === $preferences.username) {
+                            $availability[dd][hour] = {
+                                status: 'BookedByMe',
+                                bookingId: booking._id
+                            };
+                        } else {
+                            $availability[dd][hour] = {
+                                status: 'Booked',
+                                bookingId: booking._id
+                            };
+                        }
                     }
                 }
 
@@ -208,10 +217,9 @@
         let year = bookingDate.getFullYear();
         let month = bookingDate.getMonth();
         let date = bookingDate.getDate();
-        let booked = false;
 
         $createBookingRef = {
-            bookingID: $availability[day][hour],
+            status: $availability[day][hour],
             bikeID: $selectedBike,
             year: year,
             month: month,
@@ -229,6 +237,11 @@
 </script>
 
 <main>
+    <div class="legend">
+        <div><span class="legend-item Available"></span> Available</div>
+        <div><span class="legend-item BookedByMe"></span> My Bookings</div>
+        <div><span class="legend-item Booked"></span> Booked</div>
+    </div>
     <Modal open={bookingModal} onClosed={popUpClose} title="Book Bike">
         <BookingModal onClose={popUpClose}/>
     </Modal>
@@ -243,12 +256,12 @@
         <div>
             <label>
                 <input type="radio" bind:group={item} value="bike1" on:change={
-                () => {handleBikeChange('64675ee4253ddd95f01b580e')}}>
+                () => {handleBikeChange('6467cf90314e17fe4414a17f')}}>
                 Nihola - Bike 1
             </label>
             <label>
                 <input type="radio" bind:group={item} value="bike2" on:change={
-                () => {handleBikeChange('64675ee4253ddd95f01b580f')}}>
+                () => {handleBikeChange('64675ee4253ddd95f01b580e')}}>
                 Bullitt - Bike 2
             </label>
         </div>
@@ -282,7 +295,12 @@
                             on:click={() => editBooking(dayDate, hour)}>
                             {hour}:00
                         </td>
-                    {:else}
+                    {:else if $availability[dayDate][hour].status === 'BookedByMe'}
+                        <td class="cell BookedByMe"
+                            on:click={() => editBooking(dayDate, hour)}>
+                            {hour}:00
+                        </td>
+                    {:else if $availability[dayDate][hour].status === 'Booked'}
                         <td class="cell Booked"
                             on:click={() => editBooking(dayDate, hour)}>
                             {hour}:00
@@ -387,6 +405,12 @@
         color: white;
     }
 
+    .cell.BookedByMe {
+        background-color: #008cff;
+        color: white;
+        cursor: pointer;
+    }
+
     .cell.Booked {
         background-color: red;
         color: white;
@@ -402,5 +426,39 @@
         transform: scale(1.2);
         transition: transform 0.2s ease-in-out;
     }
+
+    .legend {
+        display: flex;
+        justify-content: space-around;
+        margin-bottom: 20px;
+    }
+
+    .legend-item {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        margin-right: 10px;
+    }
+
+    .legend-item.Available {
+        background-color: green;
+    }
+
+    .legend-item.Past {
+        background-color: grey;
+    }
+
+    .legend-item.BookedByMe {
+        background-color: #008cff;
+    }
+
+    .legend-item.Booked {
+        background-color: red;
+    }
+
+    .legend-item.PastBooked {
+        background-color: #fd8888;
+    }
+
 
 </style>

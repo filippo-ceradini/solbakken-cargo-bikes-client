@@ -1,6 +1,6 @@
 <script>
     import io from "socket.io-client"
-    import CheckSession from "../components/CheckSession.svelte";
+
     let name = '';
     let email = '';
     let message = '';
@@ -24,7 +24,6 @@
 </script>
 
 <main>
-    <CheckSession></CheckSession>
     <img src="https://solbakken.dk/wp-content/uploads/2017/05/cropped-cropped-Solbakken-Logo.png" alt="Solbakken Logo"/>
     <h1>Contact Us</h1>
     <p>
