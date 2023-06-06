@@ -15,6 +15,7 @@
 
     $socket = io(import.meta.env.VITE_SOCKET_URL
         , {
+            credentials: true,
             transports: ['websocket'],
             upgrade: false,
             reconnection: true,
