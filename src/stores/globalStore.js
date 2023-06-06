@@ -11,5 +11,6 @@ export const preferences = persisted('preferences',
     username: null,
     showLogin: false
 });
+export const createBookingRef = writable(false)
 export const myUsername = writable()
 export const BASE_URL = writable(import.meta.env.BASE_URL)

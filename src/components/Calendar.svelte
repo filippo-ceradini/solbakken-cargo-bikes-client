@@ -1,72 +1,109 @@
 <script>
-    import {socket} from '../stores/globalStore.js';
-    import {useParams} from "svelte-navigator";
+    import {preferences, socket, createBookingRef} from '../stores/globalStore.js';
     import toastr from 'toastr';
-    let now = new Date()
+
+    export let item;
 
     let hours = Array(24).fill(null).map((_, i) => i);
     let days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']; // Start the week on Monday
 
-    let selectedBike = '64675ee4253ddd95f01b580e'; // The currently selected bike
+    let daysToView = 6
+
+    // The currently selected bike
+    let selectedBike = writable('64675ee4253ddd95f01b580e');
+    if (item === "bike2") {
+        $selectedBike = "64675ee4253ddd95f01b580f";
+    }
     let availability = writable({}); // Availability status
     let weekOffset = writable(0); // Current week offset
     let currentDay = writable(0)
-    let currentHour = writable(0)
     let dayDates = writable(0)
     let daysDates = writable(0)
-    let dayOfTheWeek = now.getDay(); // 0 (for Sunday) through 6 (for Saturday)
-    let daysUntilNextMonday;
 
+    let userEmail;
+
+    preferences.subscribe(value => {
+        userEmail = value.username;
+    });
 
     // Initialize the component
     initialize();
+
+    function handleBikeChange(bikeId) {
+        $selectedBike = bikeId;
+        console.log($selectedBike)
+        initialize();
+    }
 
     // Function to initialize the component
     function initialize() {
         let now = new Date();
 
-        $currentDay = days[now.getDay() === 0 ? 6 : now.getDay() - 1];
-        currentHour = now.getHours();
+//gets the current day from the days array
+        $currentDay = days[now.getDay() === 0 ? daysToView : now.getDay() - 1];
 
-        // Calculate days until next Monday
+//gets the current hour from the date
+        let currentHour = now.getHours();
+
+// Calculate days until next Monday
         let dayOfTheWeek = now.getDay();
-        daysUntilNextMonday = dayOfTheWeek === 0 ? 1 : (7 - dayOfTheWeek + 1) % 7;
 
+        let daysSinceLastMonday = dayOfTheWeek === 0 ? daysToView : dayOfTheWeek - 1;
+
+        let currentWeekOffset = $weekOffset;
+        if (dayOfTheWeek === 0 && $weekOffset === 0) {
+            currentWeekOffset = 0;
+        }
+
+        $dayDates = Array(daysToView + 1).fill(null).map((_, i) => {
+            let d = new Date();
+            d.setDate(now.getDate() - daysSinceLastMonday); // go to last Monday
+            d.setDate(d.getDate() + i + currentWeekOffset * (daysToView + 1)); // add 'i' days plus week offset
+            if (i < daysToView) { // first day start at 00:00
+                d.setHours(0, 0, 0, 0);
+            }
+            if (i === daysToView) { // last day ends at 23:59:59.999
+                d.setHours(23, 59, 59, 999);
+            }
+            return d;
+        });
 
         updateWeekAvailability();
+
     }
 
     // Function to update week availability
     function updateWeekAvailability() {
         $availability = generateAvailabilityMap();
         fetchBookings();
+
     }
 
     // Function to generate availability map
     function generateAvailabilityMap() {
+        let now = new Date();
+        let currentHour = now.getHours();
+        let today = new Date(now.getFullYear(), now.getMonth(), now.getDate()); // get today's date without the time
         let avMap = {};
-        let dayDates = getDayDates();
-
-        days.forEach((day, index) => {
-            let dayDate = dayDates[index];
-            let now = new Date();
-            if (dayDate < now) {
-                avMap[day] = Array(24).fill('Past');
-            } else if (dayDate.getDate() === now.getDate() && dayDate.getMonth() === now.getMonth() && dayDate.getFullYear() === now.getFullYear()) {
-                avMap[day] = Array(24).fill('Available').map((_, hour) => hour >= currentHour ? 'Available' : 'Past');
+        $dayDates.forEach((dayDate, index) => {
+            let dayOnly = new Date(dayDate.getFullYear(), dayDate.getMonth(), dayDate.getDate()); // get day's date without the time
+            if (dayOnly.getTime() < today.getTime()) {
+                avMap[dayDate] = Array(24).fill('Past');
+            } else if (dayOnly.getTime() === today.getTime()) {
+                avMap[dayDate] = Array(24).fill('Available').map((_, hour) => hour >= currentHour ? 'Available' : 'Past');
             } else {
-                avMap[day] = Array(24).fill('Available');
+                avMap[dayDate] = Array(24).fill('Available');
             }
         });
-
         return avMap;
     }
+
 
     // Function to fetch bookings
     async function fetchBookings() {
         // Get the start and end dates of the current week
-        let startDate = $daysDates[0];
-        let endDate = $daysDates[6]
+        let startDate = $dayDates[0];
+        let endDate = $dayDates[daysToView]
 
         try {
             let response = await fetch(import.meta.env.VITE_API_URL + '/api/weekly-bookings', {
@@ -77,17 +114,14 @@
                 body: JSON.stringify({
                     startDate: startDate,
                     endDate: endDate,
+                    bikeId: $selectedBike
                 }),
             });
-            let body = {
-                startDate: startDate,
-                endDate: endDate,
-            }
-
             let data = await response.json();
             if (data.status === 200) {
                 bookings = data.bookings;
-                updateAvailability();  // Update the availability map with the fetched bookings
+                // Update the availability map with the fetched bookings
+                updateAvailability();
             } else {
                 toastr.error(data.message);
             }
@@ -96,48 +130,45 @@
         }
     }
 
+    // Function to update availability
+    function updateAvailability() {
+        let now = new Date();
+        let currentDay = now; // Get the current day as YYYY-MM-DD
+        let currentHour = now.getHours();
 
+        bookings.forEach(booking => {
+            let bookingStart = new Date(booking.startTime);
+            let bookingEnd = new Date(booking.endTime);
 
-    // Function to get day dates
-    function getDayDates() {
-        let d = new Date();
-        let currentWeekOffset = $weekOffset;
-        if (d.getDay() === 0 && $weekOffset === 0) {
-            currentWeekOffset = 0;
-        }
-        $daysDates = Array(7).fill(null).map((_, i) => {
-            let d = new Date();
-            d.setDate((now.getDate() + i - 7 + daysUntilNextMonday) + currentWeekOffset * 7); // add 'i' days plus days until next Monday to the current date
-            return d;
+            // Determine the range of hours to mark as 'Booked' for each day
+            let startHour = bookingStart.getHours();
+            let endHour = bookingEnd.getHours();
+
+            // Loop over each day from the start to the end of the booking
+            for (let d = new Date(bookingStart); d <= bookingEnd; d.setDate(d.getDate() + 1)) {
+                let dd = new Date(d);
+                dd.setHours(0, 0, 0, 0);
+                if (dd.getDay() === 0) {
+                    dd.setHours(23, 59, 59, 999)
+                }
+
+                // Loop over each hour from the start to the end of the booking
+                for (let hour = startHour; hour < endHour; hour++) {
+                    if (d === currentDay && hour < currentHour) {
+                        $availability[dd][hour] = 'PastBooked';
+                    } else if (new Date(d) < new Date(currentDay)) {
+                        $availability[dd][hour] = 'PastBooked';
+                    } else {
+                        $availability[dd][hour] = booking._id;
+                    }
+                }
+
+                // Reset hours for the next day
+                startHour = 0;
+                endHour = 24;
+            }
         });
-        return Array(7).fill(null).map((_, i) => {
-            let newDate = new Date();
-            newDate.setDate((d.getDate() + i - 7 + daysUntilNextMonday) + currentWeekOffset * 7);
-            return newDate;
-        });
-
     }
-
-    // if today is Sunday
-    if (dayOfTheWeek === 0) {
-        daysUntilNextMonday = 1;
-    } else {
-        // otherwise
-        daysUntilNextMonday = (7 - dayOfTheWeek + 1) % 7;
-    }
-
-
-    dayDates = Array(7).fill(null).map((_, i) => {
-        let d = new Date();
-        d.setDate(now.getDate() + i - 7 + daysUntilNextMonday); // add 'i' days plus days until next Monday to the current date
-        return d;
-    });
-
-    $daysDates = Array(7).fill(null).map((_, i) => {
-        let d = new Date();
-        d.setDate(now.getDate() + i - 7 + daysUntilNextMonday); // add 'i' days plus days until next Monday to the current date
-        return d;
-    });
 
 
     // Function to format the date in European format (dd.mm.yyyy)
@@ -151,18 +182,10 @@
 
 
     import {writable} from "svelte/store";
+    import Modal from "./Modal.svelte";
+    import BookingModal from "./BookingModal.svelte";
 
     let bookings = []; // The current bookings
-
-
-    function updateAvailability() {
-        bookings.forEach(booking => {
-            let bookingDate = new Date(booking.startTime);
-            let day = days[bookingDate.getDay() === 0 ? 6 : bookingDate.getDay() - 1]; // Adjust for starting the week on Monday
-            let hour = bookingDate.getHours();
-            $availability[day][hour] = 'Booked';
-        });
-    }
 
 
     let cleanupFunction;
@@ -175,65 +198,40 @@
         }
         $weekOffset += offset;
         // Update the week and create new event listeners
-        cleanupFunction = updateWeekAvailability();
+        cleanupFunction = initialize();
     }
 
-    async function bookBike(day, hour) {
-        toastr.success(`Bike booked for ${day} at ${hour}:00`);
-        if ($availability[day][hour] !== 'Booked' && $availability[day][hour] !== 'Past') {
-            let bookingDate = dayDates[days.indexOf(day)]; // Get the date for the selected day
-            let year = bookingDate.getFullYear();
-            let month = bookingDate.getMonth();
-            let date = bookingDate.getDate();
-            $socket.emit("ciao")
-            console.log('createBooking', {
-                startTime: new Date(year, month, date, hour),
-                endTime: new Date(year, month, date, hour + 1),
-                itemID: selectedBike,
-                userID: "murray88mph@gmail.com"
-            });
-            $socket.emit('createBooking', {
-                startTime: new Date(year, month, date, hour),
-                endTime: new Date(year, month, date, hour + 1),
-                itemID: selectedBike,
-                userID: "murray88mph@gmail.com"
-            });
+    let bookingModal = false
+
+    async function editBooking(day, hour) {
+        let bookingDate = day; // Get the date for the selected day
+        let year = bookingDate.getFullYear();
+        let month = bookingDate.getMonth();
+        let date = bookingDate.getDate();
+        let booked = false;
+
+        $createBookingRef = {
+            bookingID: $availability[day][hour],
+            bikeID: $selectedBike,
+            year: year,
+            month: month,
+            date: date,
+            hour: hour,
         }
+        bookingModal = true;
     }
 
-
-    async function createBooking(day, hour) {
-        if ($availability[day][hour] !== 'Booked' && $availability[day][hour] !== 'Past') {
-            let bookingDate = dayDates[days.indexOf(day)]; // Get the date for the selected day
-            let year = bookingDate.getFullYear();
-            let month = bookingDate.getMonth();
-            let date = bookingDate.getDate();
-            const response = await fetch(import.meta.env.VITE_API_URL+'/api/bookings', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    startTime: new Date(year, month, date, hour),
-                    endTime: new Date(year, month, date, hour + 1),
-                    itemID: '64675ee4253ddd95f01b580e',
-                }),
-            });
-
-            const result = await response.json();
-
-            if (response.ok) {
-                console.log(result.message);
-                await fetchBookings()
-            } else {
-                console.error(result.message);
-            }
-        }
+    function popUpClose() {
+        initialize()
+        bookingModal = false;
     }
 
 </script>
 
 <main>
+    <Modal open={bookingModal} onClosed={popUpClose} title="Book Bike">
+        <BookingModal onClose={popUpClose}/>
+    </Modal>
     <div class="control-container">
         <div>
             {#if $weekOffset !== 0}
@@ -244,12 +242,14 @@
         </div>
         <div>
             <label>
-                <input type="radio" bind:group={selectedBike} value="64675ee4253ddd95f01b580e">
-                Bike 1
+                <input type="radio" bind:group={item} value="bike1" on:change={
+                () => {handleBikeChange('64675ee4253ddd95f01b580e')}}>
+                Nihola - Bike 1
             </label>
             <label>
-                <input type="radio" bind:group={selectedBike} value="6467cf90314e17fe4414a17f">
-                Bike 2
+                <input type="radio" bind:group={item} value="bike2" on:change={
+                () => {handleBikeChange('64675ee4253ddd95f01b580f')}}>
+                Bullitt - Bike 2
             </label>
         </div>
         <div>
@@ -262,27 +262,29 @@
     <table class="table-container">
         <thead>
         <tr>
-
-            {#each days as day, i (day)}
+            {#each $dayDates as dayDate, i (dayDate)}
                 <th class="cell">
-                    <h4>{formatDate($daysDates[i])}</h4>
-                    <h5>{day}</h5>
+                    <h4>{formatDate(dayDate)}</h4>
                 </th>
             {/each}
-
         </tr>
         </thead>
         <tbody>
         {#each hours as hour}
             <tr>
-                {#each days as day}
-                    {#if $availability[day][hour] === 'Past'}
-                        <td class="cell Past">
+                {#each $dayDates as dayDate}
+                    {#if $availability[dayDate][hour] === 'Past' || $availability[dayDate][hour] === 'PastBooked'}
+                        <td class="cell {$availability[dayDate][hour]}">
+                            {hour}:00
+                        </td>
+                    {:else if $availability[dayDate][hour] === 'Available'}
+                        <td class="cell {$availability[dayDate][hour]}"
+                            on:click={() => editBooking(dayDate, hour)}>
                             {hour}:00
                         </td>
                     {:else}
-                        <td class="cell {$availability[day][hour]}"
-                            on:click={() => createBooking(day, hour)}>
+                        <td class="cell Booked"
+                            on:click={() => editBooking(dayDate, hour)}>
                             {hour}:00
                         </td>
                     {/if}
@@ -358,6 +360,7 @@
 
     }
 
+
     .control-container {
         font-size: 2em;
         display: flex;
@@ -387,6 +390,17 @@
     .cell.Booked {
         background-color: red;
         color: white;
+        cursor: pointer;
+    }
+
+    .cell.PastBooked {
+        background-color: #fd8888;
+        color: white;
+    }
+
+    .cell.Available:hover, .cell.Booked:hover {
+        transform: scale(1.2);
+        transition: transform 0.2s ease-in-out;
     }
 
 </style>

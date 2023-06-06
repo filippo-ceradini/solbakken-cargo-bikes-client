@@ -10,7 +10,7 @@
 
     async function login() {
         console.log("login")
-        const response = await fetch('http://localhost:8080/logintest', {
+        const response = await fetch('http://localhost:8080/login', {
 
             method: 'POST',
             headers: {
@@ -30,11 +30,10 @@
 
     async function testSession() {
         try {
-            const response = await fetch('http://localhost:8080/user', {
+            const response = await fetch(import.meta.env.VITE_API_URL +'/user', {
                 method: 'GET',
                 credentials: 'include', // Needed to include the session cookie in the request
                 headers: {
-                    'Accept': 'application/json',
                     'Content-Type': 'application/json'
                 }
             });
