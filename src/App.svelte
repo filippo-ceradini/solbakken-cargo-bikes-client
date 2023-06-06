@@ -8,22 +8,17 @@
 
     import Contact from "./pages/Contact.svelte";
     import Account from "./pages/Account.svelte";
-    import {preferences, socket} from './stores/globalStore.js';
+    import {preferences, socketconfig} from './stores/globalStore.js';
     import Calendar from "./components/Calendar.svelte";
     import fourOfour from "./components/fourOfour.svelte";
     import Report from "./pages/Report.svelte";
 
-    $socket = io(import.meta.env.VITE_SOCKET_URL
+    const socket = io(socketconfig
         , {
-            credentials: true,
-            transports: ['websocket'],
-            upgrade: false,
-            reconnection: true,
-            reconnectionDelay: 1000,
-            reconnectionDelayMax: 5000,
-            reconnectionAttempts: 5});
-    $socket.on("connect", () => {
-        $socket.emit("session")
+            withCredentials: true
+        });
+    socket.on("connect", () => {
+        socket.emit("session")
     });
 
     let loggedIn;

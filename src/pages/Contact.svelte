@@ -1,11 +1,14 @@
 <script>
     import io from "socket.io-client"
+    import {socketconfig} from "../stores/globalStore.js";
 
     let name = '';
     let email = '';
     let message = '';
 
-    const socket = io('localhost:8080');
+    const socket = io(socketconfig, {
+        withCredentials: true
+    });
 
     const onSubmit = () => {
         // Handle form submission here

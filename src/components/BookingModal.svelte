@@ -1,12 +1,14 @@
 <script>
-    import {preferences, createBookingRef} from '../stores/globalStore.js';
+    import {preferences, createBookingRef, socketconfig} from '../stores/globalStore.js';
     import io from "socket.io-client"
     import toastr from "toastr";
 
     export let onClose;
     let hours = 1;  // Add this line
 
-    const socket = io('localhost:8080');
+    const socket = io(socketconfig, {
+        withCredentials: true
+    });
     let bookedBooking = "";
 
     //Create a booking
