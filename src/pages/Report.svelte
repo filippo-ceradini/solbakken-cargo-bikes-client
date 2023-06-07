@@ -1,7 +1,7 @@
 <script>
     import {preferences} from "../stores/globalStore.js";
     import toastr from 'toastr';
-    import {navigate} from "svelte-routing";
+    import {navigate} from "svelte-navigator";
 
     let message = 'ggg';
     let email = $preferences.username;
@@ -21,7 +21,7 @@
 
         if (response.ok) {
             toastr.success('Your report has been sent');
-            navigate('/');
+            navigate('/')
         } else {
             toastr.error('Something went wrong');
         }
