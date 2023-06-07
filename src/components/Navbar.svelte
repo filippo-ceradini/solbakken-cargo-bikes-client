@@ -1,12 +1,13 @@
 <script>
-    import {preferences, socketconfig} from '../stores/globalStore.js'
+    import {preferences, socketConfig} from '../stores/globalStore.js'
     import toastr from 'toastr';
+
     import 'toastr/build/toastr.min.css';
     import {onMount} from 'svelte';
     import {navigate} from "svelte-navigator";
     import io from "socket.io-client";
 
-    const socket = io(socketconfig
+    const socket = io(socketConfig
         , {
             withCredentials: true
         });

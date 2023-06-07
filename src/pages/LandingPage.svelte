@@ -2,7 +2,7 @@
     import Login from "../components/Login.svelte";
     import Signup from "../components/Signup.svelte";
     import Modal from "../components/Modal.svelte";
-    import {preferences, socketconfig} from '../stores/globalStore.js'
+    import {preferences, socketConfig} from '../stores/globalStore.js'
     import toastr from "toastr";
     import CheckSession from "../components/CheckSession.svelte";
     import io from "socket.io-client";
@@ -12,7 +12,7 @@
         showLogin = value.showLogin;
     });
 
-    const socket = io(socketconfig
+    const socket = io(socketConfig
         , {
             withCredentials: true
         });

@@ -1,12 +1,12 @@
 <script>
     import io from "socket.io-client"
-    import {socketconfig} from "../stores/globalStore.js";
+    import {socketConfig} from "../stores/globalStore.js";
 
     let name = '';
     let email = '';
     let message = '';
 
-    const socket = io(socketconfig, {
+    const socket = io(socketConfig, {
         withCredentials: true
     });
 

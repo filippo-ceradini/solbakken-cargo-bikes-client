@@ -1,12 +1,12 @@
 <script>
-    import {preferences, createBookingRef, socketconfig} from '../stores/globalStore.js';
+    import {preferences, createBookingRef, socketConfig, toastr1000, toastr4000} from '../stores/globalStore.js';
     import io from "socket.io-client"
     import toastr from "toastr";
 
     export let onClose;
     let hours = 1;  // Add this line
 
-    const socket = io(socketconfig, {
+    const socket = io(import.meta.env.VITE_SOCKET_URL, {
         withCredentials: true
     });
     let bookedBooking = "";
@@ -30,10 +30,18 @@
         const result = await response.json();
 
         if (response.ok) {
-            toastr.success(result.message);
-            onClose()
+            if (result.message === 'Booking created successfully, but the end time was adjusted due to overlap with an existing booking') {
+                toastr.options = toastr4000
+                toastr.warning(result.message);
+                toastr.options = toastr1000
+                onClose()
+            } else {
+                toastr.success(result.message);
+                onClose()
+            }
         } else {
             toastr.error(result.message);
+            onClose()
         }
     }
 

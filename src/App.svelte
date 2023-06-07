@@ -8,12 +8,12 @@
 
     import Contact from "./pages/Contact.svelte";
     import Account from "./pages/Account.svelte";
-    import {preferences, socketconfig} from './stores/globalStore.js';
+    import {preferences, socketConfig} from './stores/globalStore.js';
     import Calendar from "./components/Calendar.svelte";
     import fourOfour from "./components/fourOfour.svelte";
     import Report from "./pages/Report.svelte";
 
-    const socket = io(import.meta.env.VITE_SOCKET_URL
+    const socket = io(socketConfig
         , {
             withCredentials: true
         });
