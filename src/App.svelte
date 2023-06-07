@@ -13,7 +13,7 @@
     import fourOfour from "./components/fourOfour.svelte";
     import Report from "./pages/Report.svelte";
 
-    const socket = io(socketconfig
+    const socket = io(import.meta.env.VITE_SOCKET_URL
         , {
             withCredentials: true
         });

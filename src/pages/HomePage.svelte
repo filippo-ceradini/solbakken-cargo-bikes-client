@@ -2,18 +2,21 @@
     import { navigate} from 'svelte-navigator';
     import {onMount} from "svelte";
     import io from "socket.io-client";
-    import {socketconfig} from "../stores/globalStore.js";
 
-    const socket = io(socketconfig, {
-        withCredentials: true
-    });
 
     let bike1 = 'https://cykelgruppen.dk/wp-content/uploads/2021/01/DK10004-scaled.jpg';
     let bike2 = 'https://www.larryvsharry.com/media/wysiwyg/cms_pages/Homepage/new-Original.jpg'
 
+    const socket = io(import.meta.env.VITE_SOCKET_URL
+        , {
+            withCredentials: true
+        });
+
     let statusBike1 = "";
     let statusBike2 = "";
     onMount(() => {
+        console.log('socket')
+        socket.emit("test")
         socket.emit("getBikeStatus");
         socket.on('bike-status', (data) => {
             console.log(data)
