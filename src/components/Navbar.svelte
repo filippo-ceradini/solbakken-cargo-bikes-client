@@ -1,9 +1,15 @@
 <script>
-    import {preferences, socket} from '../stores/globalStore.js'
+    import {preferences, socketconfig} from '../stores/globalStore.js'
     import toastr from 'toastr';
     import 'toastr/build/toastr.min.css';
     import {onMount} from 'svelte';
     import {navigate} from "svelte-navigator";
+    import io from "socket.io-client";
+
+    const socket = io(socketconfig
+        , {
+            withCredentials: true
+        });
 
     let username = null;
     preferences.subscribe(value => {
@@ -46,7 +52,7 @@
     function logout() {
         preferences.update(value => {
             if (value.username !== null) {
-                $socket.emit("logout", value.username);
+                socket.emit("logout", value.username);
                 return {
                     theme: 'dark',
                     loggedIn: false,

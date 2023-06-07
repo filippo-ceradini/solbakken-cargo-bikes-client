@@ -2,17 +2,23 @@
     import Login from "../components/Login.svelte";
     import Signup from "../components/Signup.svelte";
     import Modal from "../components/Modal.svelte";
-    import { preferences, socket} from '../stores/globalStore.js'
+    import {preferences, socketconfig} from '../stores/globalStore.js'
     import toastr from "toastr";
     import CheckSession from "../components/CheckSession.svelte";
+    import io from "socket.io-client";
     let showLogin = false;
     let showSignUp = false;
     preferences.subscribe(value => {
         showLogin = value.showLogin;
     });
 
+    const socket = io(socketconfig
+        , {
+            withCredentials: true
+        });
 
-    $socket.on('broadcast-log-messages', (data) => {
+
+    socket.on('broadcast-log-messages', (data) => {
         if (data.success) {
             toastr.success(`${data.email} logged in`);
 

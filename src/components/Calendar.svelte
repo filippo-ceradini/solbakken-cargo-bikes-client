@@ -10,7 +10,7 @@
     let daysToView = 6
 
     // The currently selected bike is the Nihola
-    let selectedBike;
+    let selectedBike = writable();
     $selectedBike = '6467cf90314e17fe4414a17f';
     if (item === "bike2") {
         // The currently selected bike is the Bullitt
@@ -20,7 +20,6 @@
     let weekOffset = writable(0); // Current week offset
     let currentDay = writable(0)
     let dayDates = writable(0)
-
     let userEmail;
 
     preferences.subscribe(value => {
@@ -119,7 +118,6 @@
             let data = await response.json();
             if (data.status === 200) {
                 bookings = data.bookings;
-                // Update the availability map with the fetched bookings
                 updateAvailability();
             } else {
                 toastr.error(data.message);
