@@ -1,6 +1,7 @@
 <script>
     import io from "socket.io-client"
     import {socketConfig} from "../stores/globalStore.js";
+    import toastr from "toastr";
 
     let name = '';
     let email = '';
@@ -17,10 +18,9 @@
         socket.emit("contact-email", {name, email, message});
         socket.on("email-response", function (data) {
             if (data.status === 200) {
-                alert(data.message);
+                toastr.success(data.message);
             } else {
-                console.log("Error:", data.message);
-                alert("Error: " + data.message);
+                toastr.error("Error: " + data.message);
             }
         });
     }
