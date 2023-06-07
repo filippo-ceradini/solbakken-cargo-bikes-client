@@ -4,7 +4,7 @@
 
     import 'toastr/build/toastr.min.css';
     import {onMount} from 'svelte';
-    import {navigate} from "svelte-navigator";
+    import {navigate} from "svelte-routing";
     import io from "socket.io-client";
 
     const socket = io(socketConfig
@@ -73,7 +73,7 @@
 </script>
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark p-3 fixed-top">
-    <a class="navbar-brand" href="#" on:click|preventDefault={() => navigate('/')}>Home</a>
+    <a class="navbar-brand" href="javascript:void(0)" on:click|preventDefault={() => navigate('/')}>Home</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse"
             data-target="#navbarCollapsible" aria-controls="navbarCollapsible"
             aria-expanded="false" aria-label="Toggle navigation">
@@ -83,21 +83,21 @@
     <div class="collapse navbar-collapse" id="navbarCollapsible">
         <ul class="navbar-nav mr-auto">
             <li class="nav-item">
-                <a class="nav-link" href="#" on:click|preventDefault={() => navigate('/contact')}>Contact</a>
+                <a class="nav-link" href="javascript:void(0)" on:click|preventDefault={() => navigate('/contact')}>Contact</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="#" on:click|preventDefault={() => navigate('/about')}>About</a>
+                <a class="nav-link" href="/about" on:click|preventDefault={() => navigate('/about')}>About</a>
             </li>
         </ul>
         <ul class="navbar-nav ml-auto">
             {#if loggedIn}
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                    <a class="nav-link dropdown-toggle" href="javascript:void(0)" id="navbarDropdown" role="button"
                        data-toggle="dropdown" aria-expanded="false">
                         {username}
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" on:click|preventDefault={() => navigate('/account')}>Profile</a>
+                        <a class="dropdown-item" on:click|preventDefault={() => navigate('/account')} on:keypress>Profile</a>
                         <div class="dropdown-divider"></div>
                         <a class="dropdown-item" on:click={logout} on:keypress>Logout</a>
                     </div>

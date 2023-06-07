@@ -1,5 +1,5 @@
 <script>
-    import {Route, Router} from "svelte-navigator";
+    import {Route, Router} from "svelte-routing";
     import Navbar from "./components/Navbar.svelte";
     import HomePage from "./pages/HomePage.svelte";
     import io from "socket.io-client"
