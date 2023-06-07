@@ -4,7 +4,7 @@
 
     import 'toastr/build/toastr.min.css';
     import {onMount} from 'svelte';
-    import {navigate} from "svelte-routing";
+    import {navigate} from "svelte-navigator";
     import io from "socket.io-client";
 
     const socket = io(socketConfig
