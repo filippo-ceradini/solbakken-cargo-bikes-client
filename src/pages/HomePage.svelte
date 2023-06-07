@@ -10,9 +10,7 @@
     let bike2 = 'https://www.larryvsharry.com/media/wysiwyg/cms_pages/Homepage/new-Original.jpg'
 
     const socket = io(import.meta.env.VITE_SOCKET_URL
-        , {
-            withCredentials: true
-        });
+        , {withCredentials: true});
 
     let statusBike1 = "Waiting-for-status"
     let statusBike2 = "Waiting-for-status";
@@ -44,6 +42,7 @@
         const {username} = $preferences;
         const response = await fetch(import.meta.env.VITE_API_URL + '/api/create-booking', {
             method: 'POST',
+            credentials: 'include',
             headers: {
                 'Content-Type': 'application/json',
             },

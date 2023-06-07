@@ -8,9 +8,7 @@
 
 
     const socket = io(socketConfig
-        , {
-            withCredentials: true
-        });
+        , {withCredentials: true});
 
     let signupName = '';
     let signupEmail = '';

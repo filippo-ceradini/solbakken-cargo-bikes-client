@@ -17,6 +17,7 @@
         const {username} = $preferences;
         const response = await fetch(import.meta.env.VITE_API_URL + '/api/create-booking', {
             method: 'POST',
+            credentials: 'include',
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -52,9 +53,9 @@
     async function deleteBooking() {
         const response = await fetch(import.meta.env.VITE_API_URL + '/api/bookings/cancel', {
             method: 'POST',
+            credentials: 'include',
             headers: {
                 'Content-Type': 'application/json',
-                'credentials': 'include',
             },
             body: JSON.stringify({
                 bookingID: $createBookingRef.status.bookingId,

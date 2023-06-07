@@ -8,9 +8,7 @@
     import io from "socket.io-client";
 
     const socket = io(socketConfig
-        , {
-            withCredentials: true
-        });
+        , {withCredentials: true});
 
     let username = null;
     preferences.subscribe(value => {

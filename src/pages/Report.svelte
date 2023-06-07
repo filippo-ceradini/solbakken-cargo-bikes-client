@@ -3,7 +3,7 @@
     import toastr from 'toastr';
     import {navigate} from "svelte-navigator";
 
-    let message = 'ggg';
+    let message = "";
     let email = $preferences.username;
     let photoFile;
 
@@ -18,6 +18,10 @@
 
         const response = await fetch(import.meta.env.VITE_API_URL+'/upload', {
             method: 'POST',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json',
+            },
             body: formData,
         });
 
@@ -45,8 +49,9 @@
     <form on:submit|preventDefault={onSubmit}>
         <div class="input-group">
             <label for="message">Message:</label>
-            <textarea id="message" bind:value={message}></textarea>
+            <textarea id="message" bind:value={message} placeholder="Tell us what the problem is.."></textarea>
         </div>
+        <p>Snap a photo if you can!</p>
         <div class="form-group">
             <label>Select Photo:</label>
             <input accept="image/*" capture="camera" class="form-control" id="photo" name="photo" type="file" on:change={onFileChange}>

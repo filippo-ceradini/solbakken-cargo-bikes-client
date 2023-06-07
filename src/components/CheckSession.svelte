@@ -1,9 +1,8 @@
 <script>
-    import {preferences } from "../stores/globalStore.js";
     import toastr from "toastr";
     import io from "socket.io-client";
 
-    const socket = io(import.meta.env.VITE_SOCKET_URL);
+    const socket = io(import.meta.env.VITE_SOCKET_URL, {withCredentials: true} );
     socket.on("connect", () => {
         socket.emit("test", {message: "test"})
     });
@@ -30,7 +29,7 @@
 
     async function testSession() {
         try {
-            const response = await fetch(import.meta.env.VITE_API_URL +'/user', {
+            const response = await fetch(import.meta.env.VITE_API_URL +'/api/user', {
                 method: 'GET',
                 credentials: 'include', // Needed to include the session cookie in the request
                 headers: {
@@ -44,7 +43,9 @@
 
             const data = await response.json();
             console.log(data); // This will log the response data (the user's email) to the console
-
+            if (data.user.email) {
+                toastr.success("You are logged in as " + data.user.email);
+            }
         } catch (error) {
             console.log('Error:', error);
             toastr.error("Oops! Something went wrong.");
@@ -64,6 +65,14 @@
     function testSessionSocket(){
         console.log("test socket session")
         socket.emit("test socket session", "test")
+        socket.on("session", (data) => {
+            console.log(data)
+            if (data.user.email) {
+                toastr.success("You are logged in as " + data.user.email);
+            } else if (data){
+                toastr.error("You are not logged in");
+            }
+        })
     }
 
     function logoutSocket(){

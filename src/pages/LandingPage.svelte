@@ -13,9 +13,7 @@
     });
 
     const socket = io(socketConfig
-        , {
-            withCredentials: true
-        });
+        , {withCredentials: true});
 
 
     socket.on('broadcast-log-messages', (data) => {

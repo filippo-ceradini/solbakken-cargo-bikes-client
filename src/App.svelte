@@ -13,6 +13,7 @@
     import fourOfour from "./components/fourOfour.svelte";
     import Report from "./pages/Report.svelte";
     import Verification from "./pages/Verification.svelte";
+    import ResetPassword from "./pages/ResetPassword.svelte";
 
     const socket = io(socketConfig
         , {
@@ -45,6 +46,7 @@
         <Route path="/" component={LandingPage}/>
     {/if}
     <Route path="/verify/:userId/:uniqueString" let:params component={Verification}/>
+    <Route path="/reset-password/:userId/:uniqueString" let:params component={ResetPassword}/>
     <Route path="/about" component={About}/>
     <Route path="/contact" component={Contact}/>
     <Route path="*" component={fourOfour}/>
