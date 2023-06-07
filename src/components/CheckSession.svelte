@@ -8,22 +8,29 @@
     });
 
     async function login() {
-        console.log("login")
-        const response = await fetch('http://localhost:8080/login', {
+        try {
+            const response = await fetch(import.meta.env.VITE_API_URL +'/user', {
+                method: 'GET',
+                credentials: 'include', // Needed to include the session cookie in the request
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
 
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            credentials: 'include', // This is important for sending and receiving cookies
-            body: JSON.stringify({
-                email: 'murray88mph@gmail.com',
-                password: 'password',
-            }),
-        });
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
 
-        const data = await response.json();
-        console.log(data); // Log the server's response to the console
+            const data = await response.json();
+            console.log(data); // This will log the response data (the user's email) to the console
+            if (data.user.email) {
+                toastr.success("You are logged in as " + data.user.email);
+            }
+        } catch (error) {
+            console.log('Error:', error);
+            toastr.error("Oops! Something went wrong.");
+        }
+        socket.emit("session", "test")
     }
 
 
@@ -84,7 +91,7 @@
 
 <main>
     <div>
-        <button on:click={login}>Test Login express</button>
+        <button on:click={login}>Check express unauth</button>
         <button on:click={testSession}>Check Session express</button>
         <button on:click={logout}>Logout express</button>
     </div>
