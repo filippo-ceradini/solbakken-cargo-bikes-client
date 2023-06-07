@@ -1,7 +1,8 @@
 <script>
     import io from "socket.io-client"
-    import {socketConfig} from "../stores/globalStore.js";
+    import {socketConfig, toastr1000, toastr4000} from "../stores/globalStore.js";
     import toastr from "toastr";
+    import {navigate} from "svelte-navigator";
 
     let name = '';
     let email = '';
@@ -16,9 +17,15 @@
         toastr.info("Sending email...");
         // Send Email
         socket.emit("contact-email", {name, email, message});
-        socket.on("email-response", function (data) {
+        socket.on("contact-response", function (data) {
             if (data.status === 200) {
+                toastr.options = toastr4000;
                 toastr.success(data.message);
+                toastr.options = toastr1000;
+                name = '';
+                email = '';
+                message = '';
+                navigate("/");
             } else {
                 toastr.error("Error: " + data.message);
             }
