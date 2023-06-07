@@ -12,6 +12,7 @@
     import Calendar from "./components/Calendar.svelte";
     import fourOfour from "./components/fourOfour.svelte";
     import Report from "./pages/Report.svelte";
+    import Verification from "./pages/Verification.svelte";
 
     const socket = io(socketConfig
         , {
@@ -43,6 +44,7 @@
     {:else}
         <Route path="/" component={LandingPage}/>
     {/if}
+    <Route path="/verify/:userId/:uniqueString" let:params component={Verification}/>
     <Route path="/about" component={About}/>
     <Route path="/contact" component={Contact}/>
     <Route path="*" component={fourOfour}/>

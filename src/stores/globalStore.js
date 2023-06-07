@@ -3,8 +3,6 @@ import { persisted } from 'svelte-local-storage-store'
 import { io } from 'socket.io-client';
 import toastr from "toastr";
 
-export const socket = writable();
-
 export const preferences = persisted('preferences',
     {
     theme: 'dark',

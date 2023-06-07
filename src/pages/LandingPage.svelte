@@ -70,8 +70,8 @@
     <Modal bind:open={showLogin} title="Login" onClosed={(data) => onPopupClose(data)}>
         <Login/>
     </Modal>
-    <Modal open={showSignUp} title="Sign-up" onClosed={(data) => onPopupClose(data)}>
-        <Signup/>
+    <Modal open={showSignUp} title="Sign-up" onClose={(data) => onPopupClose(data)}>
+        <Signup onClose={(data) => onPopupClose(data)}/>
     </Modal>
 
 </main>

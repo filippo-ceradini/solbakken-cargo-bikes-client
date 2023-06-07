@@ -2,6 +2,8 @@
     import { navigate} from 'svelte-navigator';
     import {onMount} from "svelte";
     import io from "socket.io-client";
+    import { preferences} from "../stores/globalStore.js";
+    import toastr from "toastr";
 
 
     let bike1 = 'https://cykelgruppen.dk/wp-content/uploads/2021/01/DK10004-scaled.jpg';
@@ -12,11 +14,9 @@
             withCredentials: true
         });
 
-    let statusBike1 = "";
-    let statusBike2 = "";
+    let statusBike1 = "Waiting-for-status"
+    let statusBike2 = "Waiting-for-status";
     onMount(() => {
-        console.log('socket')
-        socket.emit("test")
         socket.emit("getBikeStatus");
         socket.on('bike-status', (data) => {
             console.log(data)
@@ -24,7 +24,6 @@
             statusBike2 = data['Bullitt Bike 2'];
         });
     })
-
 
     function bookBike1() {
         navigate('/book/bike1');
@@ -34,9 +33,41 @@
         navigate('/book/bike2');
     }
 
-    function modalBook() {
-        alert('You have booked this bike')
+    //Create a booking
+    async function createBooking(bikeID) {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = now.getMonth();
+        const date = now.getDate();
+        const hour = now.getHours();
+
+        const {username} = $preferences;
+        const response = await fetch(import.meta.env.VITE_API_URL + '/api/create-booking', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                startTime: new Date(year, month, date, hour),
+                endTime: new Date(year, month, date, hour + 1),
+                itemID: bikeID,
+                userEmail: username,
+            }),
+        });
+        console.log({
+            startTime: new Date(year, month, date, hour),
+            endTime: new Date(year, month, date, hour + 1),
+            itemID: bikeID,
+            userEmail: username})
+        const result = await response.json();
+
+        if (response.ok) {
+            toastr.success(result.message);
+        } else {
+            toastr.error(result.message);
+        }
     }
+
 </script>
 
 <main>
@@ -57,12 +88,24 @@
     <div class="row">
         <div class="col">
             <div class="bike-container">
-                <button class="status-label {statusBike1.toLowerCase()}" on:click={modalBook}>{statusBike1}</button>
+                <button class="status-label {statusBike1.toLowerCase()}" on:click={() =>{
+                    if (statusBike1 === 'Available Now') {
+                        createBooking('6467cf90314e17fe4414a17f')
+                    } else {
+                        toastr.error('Bike 1 is already booked')
+                    }
+                }}>{statusBike1}</button>
             </div>
         </div>
         <div class="col">
             <div class="bike-container">
-                <button class="status-label {statusBike2.toLowerCase()}" on:click={modalBook}>{statusBike2}</button>
+                <button class="status-label {statusBike2.toLowerCase()}" on:click={() =>{
+                    if (statusBike2 === 'Available Now') {
+                        createBooking('64675ee4253ddd95f01b580e')
+                    } else {
+                        toastr.error('Bike 2 is already booked')
+                    }
+                }}>{statusBike2}</button>
             </div>
         </div>
     </div>
@@ -85,7 +128,6 @@
         font-weight: bold;
         text-transform: uppercase;
         border-radius: 5px;
-        cursor: pointer;
     }
 
     .status-label.available {
@@ -94,6 +136,10 @@
 
     .status-label.booked {
         background-color: red;
+    }
+
+    .status-label.waiting-for-status {
+        background-color: #008cff;
     }
 
     .bike-image {

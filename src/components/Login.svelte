@@ -1,6 +1,6 @@
 <script>
     import toastr from "toastr";
-    import { preferences,socket } from "../stores/globalStore";
+    import { preferences } from "../stores/globalStore";
     let login_email = '';
     let login_password = '';
     async function handleLogin() {

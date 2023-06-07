@@ -7,6 +7,8 @@
     let email = $preferences.username;
     let photoFile;
 
+
+
     const onSubmit = async () => {
         toastr.info('Sending report...');
         const formData = new FormData();

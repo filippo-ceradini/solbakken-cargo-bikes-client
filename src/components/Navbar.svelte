@@ -83,7 +83,7 @@
     <div class="collapse navbar-collapse" id="navbarCollapsible">
         <ul class="navbar-nav mr-auto">
             <li class="nav-item">
-                <a class="nav-link" href="javascript:void(0)" on:click|preventDefault={() => navigate('/contact')}>Contact</a>
+                <a class="nav-link" href=")" on:click|preventDefault={() => navigate('/contact')}>Contact</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="/about" on:click|preventDefault={() => navigate('/about')}>About</a>

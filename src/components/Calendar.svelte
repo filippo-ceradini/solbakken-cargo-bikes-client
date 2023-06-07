@@ -118,6 +118,7 @@
             let data = await response.json();
             if (data.status === 200) {
                 bookings = data.bookings;
+                console.log(bookings)
                 updateAvailability();
             } else {
                 toastr.error(data.message);
