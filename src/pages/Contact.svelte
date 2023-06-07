@@ -13,7 +13,7 @@
 
     const onSubmit = () => {
         // Handle form submission here
-        console.log({ name, email, message });
+        toastr.info("Sending email...");
         // Send Email
         socket.emit("contact-email", {name, email, message});
         socket.on("email-response", function (data) {
