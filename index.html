@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" type="image/svg+xml" href="/cargo-bike-svgrepo-com.svg" />
+    <link rel="icon" type="image/svg+xml" href="./public/cargo-bike-svgrepo-com.svg" />
     <title>Solbakken Cargo Bikes</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js" integrity="sha512-VEd+nq25CkR676O+pLBnDW09R7VQX9Mdiij052gVCp5yVH3jGtH70Ho/UUv4mJDsEdTvqRCFZg0NKGiojGnUCw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.css" integrity="sha512-3pIirOrwegjM6erE5gPSwkUzO+3cTjpnV9lexlNZqvupR64iZBnOOTiiLPb9M36zpMScbmUNIcHUqKD47M719g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -14,10 +14,31 @@
     <!-- Including Dark Theme Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootswatch/4.5.2/darkly/bootstrap.min.css" rel="stylesheet"
           crossorigin="anonymous">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.1.1/cookieconsent.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.1.1/cookieconsent.min.css" />
 
 
   </head>
   <body>
+  <script>
+    window.cookieconsent.initialise({
+      "palette": {
+        "popup": {
+          "background": "#000"
+        },
+        "button": {
+          "background": "#f1d600"
+        }
+      },
+      "position": "bottom-right",
+      "content": {
+        "message": "This website uses cookies to enhance your experience.",
+        "dismiss": "Got it!",
+        "link": "Learn more",
+        "href": "https://bit.ly/3BlS71b" // Your cookie policy link
+      }
+    });
+  </script>
 
   <!-- Including jQuery -->
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"

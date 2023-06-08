@@ -32,7 +32,7 @@
             //Retrieve session if Present
             const response = await fetch(import.meta.env.VITE_API_URL + '/api/user', {
                 method: 'GET',
-                credentials: 'include', // Needed to include the session cookie in the request
+                credentials: 'include',
                 headers: {
                     'Content-Type': 'application/json'
                 }
@@ -69,6 +69,7 @@
 
 
 <Router>
+
     {#if loggedIn}
         <Route path="/" component={HomePage}/>
         <Route path="/account" component={Account}/>

@@ -17,7 +17,6 @@
     onMount(() => {
         socket.emit("getBikeStatus");
         socket.on('bike-status', (data) => {
-            console.log(data)
             statusBike1 = data['Nihola Bike 1'];
             statusBike2 = data['Bullitt Bike 2'];
         });
@@ -70,23 +69,10 @@
 </script>
 
 <main>
-
     <div class="row">
-        <div class="col">
+        <div class="col-lg-6 col-sm-12">
             <div class="bike-container">
                 <img src={bike1} class="bike-image img-fluid" alt="Bike 1" on:click={bookBike1}/>
-            </div>
-        </div>
-        <div class="col">
-            <div class="bike-container">
-                <img src={bike2} class="bike-image img-fluid" alt="Bike 2" on:click={bookBike2}/>
-            </div>
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col">
-            <div class="bike-container">
                 <button class="status-label {statusBike1.toLowerCase()}" on:click={() =>{
                     if (statusBike1 === 'Available Now') {
                         createBooking('6467cf90314e17fe4414a17f')
@@ -96,8 +82,9 @@
                 }}>{statusBike1}</button>
             </div>
         </div>
-        <div class="col">
+        <div class="col-lg-6 col-sm-12">
             <div class="bike-container">
+                <img src={bike2} class="bike-image img-fluid" alt="Bike 2" on:click={bookBike2}/>
                 <button class="status-label {statusBike2.toLowerCase()}" on:click={() =>{
                     if (statusBike2 === 'Available Now') {
                         createBooking('64675ee4253ddd95f01b580e')
@@ -119,7 +106,7 @@
 
     .status-label {
         position: absolute;
-        top: 10px;
+        bottom: 10px;
         left: 50%;
         transform: translateX(-50%);
         padding: 5px 10px;
@@ -142,9 +129,8 @@
     }
 
     .bike-image {
-        max-width: 400px;
-        max-height: 300px;
-        margin: 10px;
+        width: 100%;
+        height: auto;
         object-fit: cover;
         transition: transform 0.3s ease-in-out;
     }
@@ -152,5 +138,19 @@
     .bike-image:hover {
         transform: scale(1.05);
         cursor: pointer;
+    }
+
+    @media (max-width: 768px) {
+        .bike-container {
+            margin-bottom: 30px;
+        }
+
+        .status-label {
+            position: initial;
+            width: 100%;
+            margin-top: 10px;
+            left: initial;
+            transform: initial;
+        }
     }
 </style>
