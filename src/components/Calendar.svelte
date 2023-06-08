@@ -10,7 +10,7 @@
     let daysToView = 6
 
     // The currently selected bike is the Nihola
-    let selectedBike = writable();
+    let selectedBike;
     $selectedBike = '6467cf90314e17fe4414a17f';
     if (item === "bike2") {
         // The currently selected bike is the Bullitt
@@ -119,7 +119,6 @@
             let data = await response.json();
             if (data.status === 200) {
                 bookings = data.bookings;
-                console.log(bookings)
                 updateAvailability();
             } else {
                 toastr.error(data.message);

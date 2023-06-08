@@ -48,26 +48,37 @@
     }
 
 
-    function logout() {
-
-        socket.emit("logout", {
-            email: $preferences.username,
-        });
-        socket.on("log-messages", (data) => {
-            if (data.success) {
+    async function logout() {
+        try {
+            const response = await fetch(import.meta.env.VITE_API_URL + '/logout', {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    email: $preferences.username,
+                }),
+            });
+            const data = await response.json();
+            if (response.status === 200) {
                 $preferences = {
                     theme: 'dark',
                     loggedIn: false,
                     username: null,
                     showLogin: false
                 }
-                toastr.info("Logged out successfully",$preferences.username);
-                navigate("/");
-            } else {
-                toastr.error("Error logging out");
+                toastr.success(data.message);
+                navigate('/');
+            } else if (response.status !== 200) {
+                const errorData = await response.json();
+                toastr.error(errorData.message || 'Oops! Something went wrong.');
+                $preferences.showLogin = false;
             }
-        });
-
+        } catch (error) {
+            console.error(error);
+            toastr.error("Oops! Something went wrong.");
+        }
     }
 
 
