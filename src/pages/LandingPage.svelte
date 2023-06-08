@@ -4,9 +4,8 @@
     import Modal from "../components/Modal.svelte";
     import {preferences, socketConfig} from '../stores/globalStore.js'
     import toastr from "toastr";
-    import CheckSession from "../components/CheckSession.svelte";
     import io from "socket.io-client";
-    let showLogin = false;
+    let showLogin = $preferences.showLogin;
     let showSignUp = false;
     preferences.subscribe(value => {
         showLogin = value.showLogin;
@@ -26,10 +25,8 @@
     })
 
     const onShowLogin = () => {
-        console.log("show login")
-        preferences.update(value => {
-            return {...value, showLogin: true};
-        });
+        showLogin = true;
+        $preferences.showLogin = true;
     }
 
     const onShowSignUp = () => {
@@ -37,9 +34,7 @@
     }
 
      export const onPopupClose = () => {
-        preferences.update(value => {
-            return {...value, showLogin: false};
-        });
+         $preferences.showLogin = false;
         showSignUp = false;
     }
 

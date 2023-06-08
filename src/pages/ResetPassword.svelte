@@ -16,6 +16,7 @@
         , {withCredentials: true});
 
     onMount(async () => {
+        console.log(userId, uniqueString)
         let response = await fetch(`${import.meta.env.VITE_API_URL}/reset-password/${userId}/${uniqueString}`);
         let data = await response.json();
         console.log(data)
@@ -41,7 +42,7 @@
         socket.on('reset-password-message', (data) => {
             if (data.success) {
                 toastr.success(data.message);
-                navigate('/login');
+                navigate('/');
             } else {
                 toastr.error(data.message);
             }
@@ -79,7 +80,7 @@
         </form>
     {/if}
     {#if (!verified)}
-        <h4>Verifying your account...</h4>
+        <h4>Verifying your Link...</h4>
     {/if}
 </main>
 

@@ -17,10 +17,6 @@
                 }
             });
 
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
             const data = await response.json();
             console.log(data); // This will log the response data (the user's email) to the console
             if (data.user.email) {
@@ -43,11 +39,6 @@
                     'Content-Type': 'application/json'
                 }
             });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
             const data = await response.json();
             console.log(data); // This will log the response data (the user's email) to the console
             if (data.user.email) {
@@ -57,7 +48,6 @@
             console.log('Error:', error);
             toastr.error("Oops! Something went wrong.");
         }
-        socket.emit("session", "test")
     }
 
     function logout(){

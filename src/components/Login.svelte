@@ -25,21 +25,21 @@
                     email: login_email
                 }),
             });
+            const data = await response.json();
             if (response.status === 200) {
-                await preferences.update(value => {
-                    console.log("data.user", login_email)
-                    return {username: login_email}
-                });
-                await preferences.update(value => {
-                    return {...value, loggedIn: true};
-                });
-                await preferences.update(value => {
-                    return {...value, showLogin: false,};
-                });
-                toastr.success('Logged in successfully');
+                $preferences = {
+                    theme: 'dark',
+                    loggedIn: true,
+                    username: data.userEmail,
+                    showLogin: false
+                }
+                toastr.success(data.message);
             } else if (response.status !== 200) {
                 const errorData = await response.json();
                 toastr.error(errorData.message || 'Oops! Something went wrong.');
+                await preferences.update(value => {
+                    return {...value, showLogin: false,};
+                });
             }
         } catch (error) {
             console.error(error);

@@ -14,14 +14,46 @@
     import Report from "./pages/Report.svelte";
     import Verification from "./pages/Verification.svelte";
     import ResetPassword from "./pages/ResetPassword.svelte";
+    import {onMount} from "svelte";
+    import toastr from "toastr";
 
     const socket = io(socketConfig
         , {
             withCredentials: true
         });
-    socket.on("connect", () => {
-        socket.emit("session")
-    });
+
+    onMount(async () => {
+            $preferences = {
+                theme: 'dark',
+                loggedIn: false,
+                username: null,
+                showLogin: false
+            }
+            //Retrieve session if Present
+            const response = await fetch(import.meta.env.VITE_API_URL + '/api/user', {
+                method: 'GET',
+                credentials: 'include', // Needed to include the session cookie in the request
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            const data = await response.json();
+            // This will log the response data (the user's email) to the console
+            if (data.user !== undefined) {
+                toastr.success("You are logged in as " + data.user.email);
+                $preferences = {
+                    theme: 'dark',
+                    loggedIn: true,
+                    username: data.user.email,
+                    showLogin: false
+                }
+
+            } else {
+                toastr.info("You are not logged in");
+                $preferences.loggedIn = false;
+            }
+        }
+    )
 
     let loggedIn;
     preferences.subscribe(value => {

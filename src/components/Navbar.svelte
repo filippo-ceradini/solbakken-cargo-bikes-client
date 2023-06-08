@@ -49,22 +49,25 @@
 
 
     function logout() {
-        preferences.update(value => {
-            if (value.username !== null) {
-                socket.emit("logout", value.username);
-                return {
+
+        socket.emit("logout", {
+            email: $preferences.username,
+        });
+        socket.on("log-messages", (data) => {
+            if (data.success) {
+                $preferences = {
                     theme: 'dark',
                     loggedIn: false,
                     username: null,
                     showLogin: false
-                };
+                }
+                toastr.info("Logged out successfully",$preferences.username);
+                navigate("/");
             } else {
-                toastr.error("You are not logged in");
-                return value;
+                toastr.error("Error logging out");
             }
         });
-        toastr.info("Logged out successfully");
-        navigate("/");
+
     }
 
 
