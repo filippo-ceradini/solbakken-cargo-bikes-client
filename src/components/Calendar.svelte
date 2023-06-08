@@ -421,7 +421,7 @@
         color: white;
     }
 
-    .cell.Available:hover, .cell.Booked:hover {
+    .cell.Available:hover, .cell.Booked:hover, cell.BookedByMe {
         transform: scale(1.2);
         transition: transform 0.2s ease-in-out;
     }
