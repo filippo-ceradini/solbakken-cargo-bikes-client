@@ -27,13 +27,13 @@
             });
             const data = await response.json();
             if (response.status === 200) {
+                toastr.success(data.message);
                 $preferences = {
                     theme: 'dark',
                     loggedIn: true,
                     username: data.userEmail,
                     showLogin: false
                 }
-                toastr.success(data.message);
             } else if (response.status !== 200) {
                 const errorData = await response.json();
                 toastr.error(errorData.message || 'Oops! Something went wrong.');

@@ -10,7 +10,7 @@
     let daysToView = 6
 
     // The currently selected bike is the Nihola
-    let selectedBike;
+    let selectedBike = writable();
     $selectedBike = '6467cf90314e17fe4414a17f';
     if (item === "bike2") {
         // The currently selected bike is the Bullitt
